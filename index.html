@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Разгледай каталога на ДАР — ръчно изработени картички, покани и подаръци за малките и големите поводи.">
+  <meta name="theme-color" content="#fffdf9">
+  <title>ДАР — Малки жестове. Големи чувства.</title>
+  <link rel="preload" href="fonts/sofia-sans-regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/sofia-sans-medium.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#collection">Към каталога</a>
+  <header class="header">
+    <a class="logo" href="#top" aria-label="ДАР, начало">дар<span aria-hidden="true">✳</span><small>малки жестове, големи чувства</small></a>
+    <nav class="desktop-nav" aria-label="Основна навигация"><a href="#collection">Каталог</a><a href="#about">За ДАР</a><a href="#details">Малките детайли</a><a href="#contact">Пиши ни</a></nav>
+    <a class="header-cta" href="#collection">Разгледай <span aria-hidden="true">↗</span></a>
+    <button class="menu-button" type="button" aria-label="Отвори менюто" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span></button>
+    <nav class="mobile-nav" id="mobileNav" aria-label="Мобилна навигация" hidden><a href="#collection">Каталог</a><a href="#about">За ДАР</a><a href="#details">Малките детайли</a><a href="#contact">Пиши ни</a></nav>
+  </header>
+  <main id="top">
+    <section class="hero wrap" aria-labelledby="heroTitle">
+      <div class="hero-art">
+        <span class="shape shape-yellow" aria-hidden="true"></span><span class="shape shape-black" aria-hidden="true"></span>
+        <div class="hero-photo"><img src="thumbs/birthday%20kids/IMG_2058.JPG" width="598" height="900" alt="Ръчно изработена картичка с цветни букви и панделки за Ливия" fetchpriority="high"></div>
+        <span class="art-sticker">направено<br>с чувство<span aria-hidden="true">♡</span></span>
+        <svg class="scribble" viewBox="0 0 170 100" aria-hidden="true"><path d="m12 76 23-53 7 59 27-66 6 65 31-60 3 59 30-63 13 61"/></svg>
+        <p class="photo-caption">Хартия + въображение + малко вълшебство.</p>
+      </div>
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> РЪЧНО ИЗРАБОТЕНО · ЛИЧНО · С ОБИЧ</p>
+        <h1 id="heroTitle">Малки жестове.<br>Големи <span class="underline">чувства.</span></h1>
+        <p class="intro">За онези хора, за които обикновеното не е достатъчно.</p>
+        <p>Картички, покани и подаръци с характер. Създадени на ръка, за да съберат в себе си нещо съвсем твое — име, спомен, усмивка.</p>
+        <a class="button" href="#collection">Намери своето вдъхновение <span aria-hidden="true">↗</span></a>
+        <p class="hero-footnote">Каталог с идеи за твоите специални поводи.</p>
+      </div>
+      <span class="edge-dots" aria-hidden="true"></span>
+    </section>
+    <aside class="paper-message wrap"><div class="pink-paper"><p>Най-хубавите подаръци не казват „купих ти нещо“.<br>Казват <strong>„помислих за теб“.</strong></p><span>Ето защо съществува ДАР.</span></div><span class="little-star" aria-hidden="true">✳</span></aside>
+    <div class="catalogue-band"><span class="band-doodle doodle" aria-hidden="true"><svg viewBox="0 0 160 90"><path d="M8 60Q40 0 59 45T110 30T151 18M124 12l28 5-12 25"/></svg></span><section class="collection wrap" id="collection" aria-labelledby="collectionTitle">
+      <div class="section-heading"><div><p class="eyebrow">МАЛКА КОЛЕКЦИЯ ОТ ГОЛЕМИ ЕМОЦИИ</p><h2 id="collectionTitle">За всеки твой <span class="underline">повод.</span></h2></div><p>Разгледай, запази си идея, вдъхнови се.<br>Всеки детайл разказва различна история.</p></div>
+      <div class="catalogue-tools"><div class="filters" role="group" aria-label="Филтрирай по повод"></div><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="catalogueSearch" placeholder="Потърси вдъхновение…" aria-label="Търси в каталога"></label></div>
+      <p class="result-count" id="resultCount" role="status" aria-live="polite"></p>
+      <div class="gallery" id="gallery"></div>
+      <p class="empty-state" hidden>Няма намерени предложения. Опитай с друг повод или дума.</p>
+      <div class="load-more"><button class="button button-outline" id="loadMore" type="button">Още малко вдъхновение <span aria-hidden="true">↓</span></button></div>
+      <noscript><p>Включи JavaScript, за да филтрираш и разглеждаш целия каталог.</p><a href="images/wedding/IMG_2783.JPG">Разгледай сватбена картичка</a></noscript>
+    </section>
+    </div>
+    <section class="about wrap" id="about" aria-labelledby="aboutTitle">
+      <div class="about-copy"><p class="eyebrow">НЕЩО ПОВЕЧЕ ОТ ХАРТИЯ</p><h2 id="aboutTitle">Не е просто картичка.<br>А малко <span class="underline">„мисля за теб“.</span></h2><p>Има думи, които заслужават да останат. И поводи, които искаме да запомним с нещо, направено специално за тях.</p><p>ДАР е място за тези малки, лични жестове. За внимателно подбраните цветове, ръчно изрязаните форми и онзи последен детайл, който прави подаръка твой.</p><ul><li>Изработено на ръка, с внимание към детайла</li><li>Вдъхновено от истински хора и техните поводи</li><li>С място за име, послание и собствена история</li></ul></div>
+      <div class="about-art"><span class="about-blob" aria-hidden="true"></span><figure><img src="thumbs/wedding/IMG_2783.JPG" alt="Детайли на ръчно изработена сватбена картичка" loading="lazy"><figcaption>Красотата е в малките детайли. <span aria-hidden="true">♡</span></figcaption></figure><span class="about-sun" aria-hidden="true">✳</span></div>
+    </section>
+    <div class="details-band"><span class="details-loop doodle" aria-hidden="true"><svg viewBox="0 0 160 130"><path d="M15 95C130 150 154 3 70 12S0 105 103 78 156 5 141 112"/></svg></span><section class="details wrap" id="details" aria-labelledby="detailsTitle"><p class="eyebrow">ВСЕКИ ДАР Е РАЗЛИЧЕН</p><h2 id="detailsTitle">Една идея. Толкова много <span class="underline">възможности.</span></h2><div class="notes"><article class="note note-orange"><span class="note-number">01 / ТВОЯТ ПОВОД</span><h3>За големите дни.<br>И малките „благодаря“.</h3><p>Рожден ден, сватба, първи учебен ден или просто защото някой ти е скъп. Винаги има повод за малко внимание.</p></article><article class="note note-pink"><span class="note-number">02 / ТВОЯТ ПОЧЕРК</span><h3>Име, цвят, послание.<br>Детайлите правят разликата.</h3><p>Разгледай моделите като отправна точка за вдъхновение. Един цвят или няколко лични думи могат да променят цялото усещане.</p></article></div></section>
+    </div>
+    <section class="contact" id="contact" aria-labelledby="contactTitle">
+      <div class="contact-inner wrap">
+        <div class="contact-copy"><p class="eyebrow">ЕДИН ХУБАВ ЖЕСТ ЗАПОЧВА С РАЗГОВОР</p><h2 id="contactTitle">Имаш идея?<br>Нека ѝ дадем <span class="underline">форма.</span></h2><p>Разкажи ни за човека, повода или модела, който ти е харесал. Ще се радваме да чуем твоята история.</p><span class="contact-stamp">малко хартия<br>много обич ♡</span><svg class="contact-arrow doodle" viewBox="0 0 180 100" aria-hidden="true"><path d="M10 20C65 5 22 93 90 64s49-27 71-15M142 30l22 20-26 18"/></svg></div>
+        <form id="contactForm" class="contact-form">
+          <div class="form-row"><label for="contactName">Твоето име <span aria-hidden="true">*</span><input id="contactName" name="name" autocomplete="name" placeholder="Как да се обръщаме към теб?" maxlength="100" required></label><label for="contactEmail">Имейл за отговор <span aria-hidden="true">*</span><input id="contactEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label></div>
+          <label for="contactOccasion">Повод или модел <span class="optional">/ по желание</span><input id="contactOccasion" name="occasion" placeholder="Рожден ден, сватба или DAR-001…" maxlength="150"></label>
+          <label for="contactMessage">Твоята идея <span aria-hidden="true">*</span><textarea id="contactMessage" name="message" rows="4" placeholder="За кого е? Какво искаш да кажеш с този малък жест?" maxlength="3000" required></textarea></label>
+          <button class="button" type="submit">Продължи към имейл <span aria-hidden="true">↗</span></button>
+          <p class="form-help" id="formHelp">Формата подготвя писмо в твоето приложение за имейл. Изпращаш го оттам.</p>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <span class="contact-scribble doodle" aria-hidden="true"><svg viewBox="0 0 170 100"><path d="m12 76 23-53 7 59 27-66 6 65 31-60 3 59 30-63 13 61"/></svg></span>
+    </section>
+    <section class="closing wrap"><span class="closing-flower" aria-hidden="true">✳</span><p>Нещо малко. Нещо лично. Нещо, което остава.</p><a href="#collection">Открий своя ДАР <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="wrap"><a class="logo" href="#top" aria-label="ДАР, начало">дар<span aria-hidden="true">✳</span></a><p>Ръчно изработени жестове, събрани в един каталог.</p><p>© 2026 ДАР</p><a href="#top" aria-label="Обратно в началото">↑</a></footer>
+  <dialog class="lightbox" id="lightbox" aria-labelledby="previewTitle"><button class="close-preview" type="button" aria-label="Затвори прегледа">×</button><div class="preview-image"><img alt=""></div><div class="preview-copy"><p class="eyebrow" id="previewCategory"></p><h2 id="previewTitle"></h2><p id="previewDescription"></p><p class="preview-id"></p><p class="preview-note">Модел от каталога на ДАР. Вдъхновение за твоя личен жест.</p></div></dialog>
+  <script src="catalogue.js"></script><script src="app.js"></script>
+</body>
+</html>
