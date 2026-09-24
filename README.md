@@ -10,7 +10,7 @@ Run `python -m http.server 8000` and open http://localhost:8000.
 
 ## Updating the catalogue
 
-Product data lives in `catalogue.js`; thumbnails and original photos live in `thumbs/` and `images/`. Typography is bundled locally in `fonts/` with its license.
+Product data lives in `catalogue.js`. The website serves responsive WebP images from `media/`; original photos remain in `images/` and the old thumbnails in `thumbs/` for reference. Run `python scripts/optimize-images.py` (requires ImageMagick) to regenerate the three image sizes and their metadata. Typography is bundled locally in `fonts/` with its license.
 
 ## Email form
 

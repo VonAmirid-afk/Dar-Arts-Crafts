@@ -22,7 +22,18 @@ let activeCategory = 'Всички';
 let limit = 6;
 let opener;
 const categories = ['Всички', ...new Set(catalogue.map(item => item.category))];
-const imagePath = (folder, path) => folder + '/' + path.split('/').map(encodeURIComponent).join('/');
+const mediaPath = (item, size) => `media/${item.id}-${size}.webp`;
+const sourceSet = (item, sizes = [480, 800, 1280]) => {
+  const widths = new Map();
+  sizes.forEach(size => widths.set(item.widths[[480, 800, 1280].indexOf(size)], mediaPath(item, size)));
+  return [...widths].map(([width, path]) => `${path} ${width}w`).join(', ');
+};
+let previewScrollY = 0;
+const previewStatus = lightbox.querySelector('.preview-status');
+lightboxImage.addEventListener('load', () => { previewStatus.textContent = ''; });
+lightboxImage.addEventListener('error', () => {
+  if (lightbox.open) previewStatus.textContent = 'Снимката не се зареди. Затвори прегледа и опитай отново.';
+});
 
 categories.forEach(category => {
   const button = document.createElement('button');
@@ -39,17 +50,26 @@ categories.forEach(category => {
 
 function openPreview(item, button) {
   opener = button;
-  lightboxImage.src = imagePath('images', item.path);
+  previewScrollY = window.scrollY;
+  document.body.style.top = `-${previewScrollY}px`;
+  document.body.classList.add('preview-open');
+  previewStatus.textContent = 'Зареждане на снимката…';
+  lightboxImage.width = item.width;
+  lightboxImage.height = item.height;
+  lightboxImage.sizes = '(max-width: 700px) calc(100vw - 20px), 540px';
+  lightboxImage.srcset = sourceSet(item);
+  lightboxImage.src = mediaPath(item, 800);
   lightboxImage.alt = `${item.title} — ${item.id}`;
   document.querySelector('#previewCategory').textContent = item.category;
   document.querySelector('#previewTitle').textContent = item.title;
   document.querySelector('#previewDescription').textContent = 'Ръчно изработен модел с личен характер. Разгледай снимката отблизо, за да откриеш цветовете, материалите и малките детайли.';
   lightbox.querySelector('.preview-id').textContent = `Модел ${item.id}`;
   lightbox.showModal();
-  lightbox.querySelector('button').focus();
+  lightbox.querySelector('.preview-content').scrollTop = 0;
+  lightbox.querySelector('button').focus({ preventScroll: true });
 }
 
-function render() {
+function render(append = false) {
   const query = search.value.trim().toLocaleLowerCase('bg');
   const matches = catalogue.filter(item => (activeCategory === 'Всички' || item.category === activeCategory) && `${item.title} ${item.category} ${item.id}`.toLocaleLowerCase('bg').includes(query));
   filters.querySelectorAll('button').forEach(button => {
@@ -57,8 +77,9 @@ function render() {
     button.classList.toggle('active', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
-  gallery.replaceChildren();
-  matches.slice(0, limit).forEach(item => {
+  const start = append ? gallery.children.length : 0;
+  if (!append) gallery.replaceChildren();
+  matches.slice(start, limit).forEach(item => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'piece';
@@ -66,7 +87,11 @@ function render() {
     const frame = document.createElement('span');
     frame.className = 'piece-image';
     const img = document.createElement('img');
-    img.src = imagePath('thumbs', item.path);
+    img.width = item.width;
+    img.height = item.height;
+    img.sizes = '(max-width: 700px) calc((100vw - 55px) / 2), (max-width: 1000px) calc((100vw - 124px) / 3), 360px';
+    img.srcset = sourceSet(item);
+    img.src = mediaPath(item, 480);
     img.alt = item.title;
     img.loading = 'lazy';
     img.decoding = 'async';
@@ -100,7 +125,7 @@ search.addEventListener('input', () => { limit = 6; render(); });
 loadMore.addEventListener('click', () => {
   const previousCount = gallery.children.length;
   limit += 6;
-  render();
+  render(true);
   gallery.children[previousCount]?.focus({ preventScroll: true });
 });
 lightbox.querySelector('.close-preview').addEventListener('click', () => lightbox.close());
@@ -108,7 +133,15 @@ lightbox.addEventListener('click', event => {
   const bounds = lightbox.getBoundingClientRect();
   if (event.target === lightbox && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) lightbox.close();
 });
-lightbox.addEventListener('close', () => { lightboxImage.removeAttribute('src'); opener?.focus({ preventScroll: true }); });
+lightbox.addEventListener('close', () => {
+  lightboxImage.removeAttribute('srcset');
+  lightboxImage.removeAttribute('src');
+  previewStatus.textContent = '';
+  document.body.classList.remove('preview-open');
+  document.body.style.removeProperty('top');
+  window.scrollTo({ top: previewScrollY, behavior: 'instant' });
+  opener?.focus({ preventScroll: true });
+});
 render();
 
 // Replace this reserved example address with the real inbox before publishing.
