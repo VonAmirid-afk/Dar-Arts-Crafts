@@ -417,3 +417,17 @@ body:has(.selection-shortcut:not([hidden])) footer{padding-bottom:100px}
   .remove-choice{font-size:11px}
   .selection-list{max-height:290px}
 }
+
+/* Quantities express the requested number of pieces in an enquiry. */
+.quantity-control{display:flex;align-items:center;justify-content:center;gap:0;margin-top:10px;align-self:center;border:1px solid #b8a994;border-radius:4px;overflow:hidden;flex:none;background:var(--paper)}
+.quantity-control button{width:44px;height:44px;padding:0;border:0;border-radius:0;background:transparent;color:var(--ink);font-size:22px;line-height:1;flex:none}
+.quantity-control button:hover:not(:disabled){background:var(--pink)}
+.quantity-control button:disabled{opacity:.35;cursor:default}
+.quantity-control input,.contact-form .quantity-control input{width:48px;min-width:0;height:44px;padding:0;margin:0;text-align:center;border:0;border-inline:1px solid #ddd2c4;border-radius:0;background:transparent;color:var(--ink);font:500 16px/1 'Sofia Sans',Arial,sans-serif;appearance:textfield;-moz-appearance:textfield}
+.quantity-control input::-webkit-inner-spin-button,.quantity-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.quantity-control :focus-visible{outline-offset:-3px}
+.selection-list li{flex-wrap:wrap}
+.selection-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding-left:64px}
+.selection-controls .quantity-control{margin-top:0}
+.preview-copy>.quantity-control{width:max-content;margin-inline:auto}
+@media(max-width:700px){.selection-controls{padding-left:0}.quantity-control button{width:40px}.quantity-control input,.contact-form .quantity-control input{width:44px}}

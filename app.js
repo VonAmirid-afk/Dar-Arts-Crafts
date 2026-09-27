@@ -33,10 +33,15 @@ const catalogueById = new Map(catalogue.map(item => [item.id, item]));
 function readSelection(value) {
   try {
     const ids = JSON.parse(value);
-    return new Set(Array.isArray(ids) ? ids.filter(id => catalogueById.has(id)) : []);
-  } catch { return new Set(); }
+    const selection = new Map();
+    if (Array.isArray(ids)) ids.forEach(entry => {
+      const [id, quantity] = typeof entry === 'string' ? [entry, 1] : Array.isArray(entry) ? entry : [];
+      if (catalogueById.has(id) && Number.isInteger(quantity) && quantity >= 1 && quantity <= 999) selection.set(id, quantity);
+    });
+    return selection;
+  } catch { return new Map(); }
 }
-let selectedModels = new Set();
+let selectedModels = new Map();
 try { selectedModels = readSelection(localStorage.getItem(selectionStorageKey)); } catch { /* Selection still works when storage is unavailable. */ }
 let previewItem = null;
 let selectionFormVisible = false;
@@ -49,7 +54,59 @@ function setChoiceButton(button, item) {
   button.dataset.model = item.id;
   button.setAttribute('aria-pressed', String(saved));
   button.setAttribute('aria-label', `${saved ? 'Премахни от избраните' : 'Добави към избраните'}: ${item.title}, ${item.id}`);
-  button.textContent = saved ? '✓ В избраните' : '+ Запази модела';
+  button.textContent = saved ? `✓ Избрани: ${selectedModels.get(item.id)} бр.` : '+ Запази модела';
+}
+function createQuantityControl(item, context) {
+  const group = document.createElement('div');
+  group.className = 'quantity-control';
+  group.dataset.model = item.id;
+  group.dataset.context = context;
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', `Брой за ${item.title}, ${item.id}`);
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.dataset.action = 'minus';
+  minus.textContent = '−';
+  minus.setAttribute('aria-label', `Намали броя за ${item.id}`);
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '1';
+  input.max = '999';
+  input.step = '1';
+  input.inputMode = 'numeric';
+  input.dataset.action = 'input';
+  input.setAttribute('aria-label', `Брой за ${item.id}`);
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.dataset.action = 'plus';
+  plus.textContent = '+';
+  plus.setAttribute('aria-label', `Увеличи броя за ${item.id}`);
+  minus.addEventListener('click', () => changeQuantity(item, selectedModels.get(item.id) - 1, context, 'minus'));
+  plus.addEventListener('click', () => changeQuantity(item, selectedModels.get(item.id) + 1, context, 'plus'));
+  input.addEventListener('change', () => changeQuantity(item, Number(input.value), context, 'input'));
+  input.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); input.blur(); } });
+  group.append(minus, input, plus);
+  return group;
+}
+function syncQuantityControls() {
+  document.querySelectorAll('.quantity-control').forEach(group => {
+    const count = selectedModels.get(group.dataset.model);
+    group.hidden = !count;
+    group.querySelector('input').value = count || 1;
+    group.querySelector('[data-action=minus]').disabled = !count || count <= 1;
+    group.querySelector('[data-action=plus]').disabled = !count || count >= 999;
+  });
+}
+function changeQuantity(item, value, context, action) {
+  if (!selectedModels.has(item.id)) return;
+  const valid = Number.isInteger(value) && value >= 1 && value <= 999;
+  if (valid) selectedModels.set(item.id, value);
+  try { localStorage.setItem(selectionStorageKey, JSON.stringify([...selectedModels])); } catch { /* Keep quantities in memory. */ }
+  syncSelection();
+  const group = document.querySelector(`.quantity-control[data-model="${item.id}"][data-context="${context}"]`);
+  const control = group?.querySelector(`[data-action="${action}"]`);
+  (control?.disabled ? group.querySelector('input') : control)?.focus({ preventScroll: true });
+  document.querySelector('.selection-announcement').textContent = valid ? `${item.id}: ${value} бр.` : 'Въведи цяло число от 1 до 999. Предишният брой е запазен.';
 }
 function syncSelection() {
   document.querySelectorAll('.save-choice[data-model]').forEach(button => setChoiceButton(button, catalogueById.get(button.dataset.model)));
@@ -60,8 +117,9 @@ function syncSelection() {
   document.querySelector('#contactMessage').required = selectedModels.size === 0;
   document.querySelector('#messageRequirement').textContent = selectedModels.size ? '/ по желание' : '*';
   const list = document.querySelector('#selectionList');
+  const listScroll = list.scrollTop;
   list.replaceChildren();
-  [...selectedModels].forEach((id, index) => {
+  [...selectedModels.keys()].forEach((id, index) => {
     const item = catalogueById.get(id);
     const row = document.createElement('li');
     const view = document.createElement('button');
@@ -92,14 +150,19 @@ function syncSelection() {
       const remaining = list.querySelectorAll('.remove-choice');
       (remaining[Math.min(index, remaining.length - 1)] || document.querySelector('#selectionTitle')).focus({ preventScroll: true });
     });
-    row.append(view, remove);
+    const controls = document.createElement('div');
+    controls.className = 'selection-controls';
+    controls.append(createQuantityControl(item, 'selection'), remove);
+    row.append(view, controls);
     list.append(row);
   });
+  list.scrollTop = listScroll;
+  syncQuantityControls();
   if (document.querySelector('#enquiryText').value) document.querySelector('#enquiryText').value = buildEnquiry().body;
 }
 function toggleSelection(item) {
   if (selectedModels.has(item.id)) selectedModels.delete(item.id);
-  else selectedModels.add(item.id);
+  else selectedModels.set(item.id, 1);
   try { localStorage.setItem(selectionStorageKey, JSON.stringify([...selectedModels])); } catch { /* Keep the in-memory selection. */ }
   syncSelection();
   document.querySelector('.selection-announcement').textContent = `${item.id} ${selectedModels.has(item.id) ? 'е добавен към' : 'е премахнат от'} избраните. Общо: ${selectedModels.size}.`;
@@ -136,6 +199,9 @@ function openPreview(item, button) {
   opener = button;
   previewItem = item;
   setChoiceButton(previewSave, item);
+  lightbox.querySelector('.quantity-control')?.remove();
+  previewSave.after(createQuantityControl(item, 'preview'));
+  syncQuantityControls();
   previewScrollY = window.scrollY;
   document.body.style.top = `-${previewScrollY}px`;
   document.body.classList.add('preview-open');
@@ -208,9 +274,10 @@ function render(append = false) {
     save.className = 'save-choice';
     setChoiceButton(save, item);
     save.addEventListener('click', () => toggleSelection(item));
-    card.append(button, save);
+    card.append(button, save, createQuantityControl(item, 'card'));
     gallery.append(card);
   });
+  syncQuantityControls();
   document.querySelector('#resultCount').textContent = `${Math.min(limit, matches.length)} от ${matches.length} предложения · ${activeCategory}`;
   document.querySelector('.empty-state').hidden = matches.length > 0;
   loadMore.hidden = limit >= matches.length;
@@ -247,9 +314,9 @@ function buildEnquiry() {
   const email = data.get('email').trim();
   const occasion = data.get('occasion').trim();
   const message = data.get('message').trim();
-  const models = [...selectedModels].map(id => {
+  const models = [...selectedModels].map(([id, quantity]) => {
     const item = catalogueById.get(id);
-    return `${id} — ${item.title}\nhttps://vonamirid-afk.github.io/Dar-Arts-Crafts/?model=${id}`;
+    return `${id} — ${item.title} — ${quantity} бр.\nhttps://vonamirid-afk.github.io/Dar-Arts-Crafts/?model=${id}`;
   });
   const subject = `Запитване за ДАР${occasion ? ` — ${occasion}` : ''}`;
   const body = `${message || 'Здравейте! Бих искал/а да науча повече за избраните модели.'}${models.length ? `\n\nИзбрани модели (${models.length}):\n${models.join('\n\n')}` : ''}\n\nПовод: ${occasion || 'Не е посочен'}\nОт: ${name}\nИмейл за отговор: ${email}`;
