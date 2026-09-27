@@ -431,3 +431,25 @@ body:has(.selection-shortcut:not([hidden])) footer{padding-bottom:100px}
 .selection-controls .quantity-control{margin-top:0}
 .preview-copy>.quantity-control{width:max-content;margin-inline:auto}
 @media(max-width:700px){.selection-controls{padding-left:0}.quantity-control button{width:40px}.quantity-control input,.contact-form .quantity-control input{width:44px}}
+
+/* Small, lightweight browsing interactions. */
+.discovery-row{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:24px}
+.discovery-row .result-count{margin:14px 0}
+.surprise-button{display:flex;align-items:center;gap:15px;min-height:44px;border:0;background:transparent;padding:8px 0 8px 12px;color:var(--ink);font-size:13px;text-decoration:underline;text-underline-offset:5px;white-space:nowrap}
+.surprise-button:disabled{opacity:.4;cursor:default}
+.preview-navigation{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid #e5dfd8;flex:none;background:var(--paper)}
+.preview-navigation button{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 14px;border:1px solid #d8c8b8;border-radius:3px;background:transparent;color:var(--ink);font-size:16px}
+.preview-navigation button span{font-size:13px}
+.preview-navigation button:hover:not(:disabled){background:var(--pink)}
+.preview-navigation button:disabled{opacity:.35;cursor:default}
+#previewPosition{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.preview-image{touch-action:pan-y pinch-zoom}
+.selection-toast{position:fixed;z-index:30;left:50%;top:calc(16px + env(safe-area-inset-top));max-width:calc(100% - 32px);width:max-content;transform:translate(-50%,-12px);padding:12px 18px;border:1px solid #e4b1bf;border-radius:4px;background:var(--pink);box-shadow:0 4px 18px #0002;font-size:13px;color:var(--ink);pointer-events:none;opacity:0;transition:opacity .18s,transform .18s}
+.selection-toast.visible{opacity:1;transform:translate(-50%,0)}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .save-choice,.filter,.surprise-button{transition:background .18s,transform .18s}
+  .save-choice:hover,.surprise-button:hover:not(:disabled){transform:translateY(-2px)}
+  .star-icon{transition:transform .3s}
+  .logo:hover .star-icon{transform:rotate(45deg)}
+}
+@media(max-width:360px){.discovery-row{gap:8px}.surprise-button{font-size:12px;gap:6px;padding-left:0}.discovery-row .result-count{font-size:9px}}

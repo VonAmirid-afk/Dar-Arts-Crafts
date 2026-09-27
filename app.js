@@ -21,6 +21,15 @@ const lightboxImage = lightbox.querySelector('img');
 let activeCategory = 'Всички';
 let limit = 6;
 let opener;
+let previewModels = [];
+let lastSurprise = null;
+let revealObserver = null;
+let toastTimer;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+function filteredModels() {
+  const query = search.value.trim().toLocaleLowerCase('bg');
+  return catalogue.filter(item => (activeCategory === 'Всички' || item.category === activeCategory) && `${item.title} ${item.category} ${item.id}`.toLocaleLowerCase('bg').includes(query));
+}
 const categories = ['Всички', ...new Set(catalogue.map(item => item.category))];
 const mediaPath = (item, size) => `media/${item.id}-${size}.webp`;
 const sourceSet = (item, sizes = [480, 800, 1280]) => {
@@ -165,7 +174,13 @@ function toggleSelection(item) {
   else selectedModels.set(item.id, 1);
   try { localStorage.setItem(selectionStorageKey, JSON.stringify([...selectedModels])); } catch { /* Keep the in-memory selection. */ }
   syncSelection();
-  document.querySelector('.selection-announcement').textContent = `${item.id} ${selectedModels.has(item.id) ? 'е добавен към' : 'е премахнат от'} избраните. Общо: ${selectedModels.size}.`;
+  const message = `${item.id} ${selectedModels.has(item.id) ? 'е добавен към' : 'е премахнат от'} избраните. Общо: ${selectedModels.size}.`;
+  document.querySelector('.selection-announcement').textContent = message;
+  const toast = document.querySelector('#selectionToast');
+  toast.textContent = message;
+  toast.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 2400);
 }
 previewSave.addEventListener('click', () => { if (previewItem) toggleSelection(previewItem); });
 window.addEventListener('storage', event => {
@@ -196,15 +211,20 @@ categories.forEach(category => {
 });
 
 function openPreview(item, button) {
-  opener = button;
+  const opening = !lightbox.open;
+  if (opening) {
+    opener = button;
+    const filtered = filteredModels();
+    previewModels = filtered.some(model => model.id === item.id) ? filtered : catalogue;
+    previewScrollY = window.scrollY;
+    document.body.style.top = `-${previewScrollY}px`;
+    document.body.classList.add('preview-open');
+  }
   previewItem = item;
   setChoiceButton(previewSave, item);
   lightbox.querySelector('.quantity-control')?.remove();
   previewSave.after(createQuantityControl(item, 'preview'));
   syncQuantityControls();
-  previewScrollY = window.scrollY;
-  document.body.style.top = `-${previewScrollY}px`;
-  document.body.classList.add('preview-open');
   previewStatus.textContent = 'Зареждане на снимката…';
   lightboxImage.width = item.width;
   lightboxImage.height = item.height;
@@ -216,14 +236,16 @@ function openPreview(item, button) {
   document.querySelector('#previewTitle').textContent = item.title;
   document.querySelector('#previewDescription').textContent = 'Ръчно изработен модел с личен характер. Разгледай снимката отблизо, за да откриеш цветовете, материалите и малките детайли.';
   lightbox.querySelector('.preview-id').textContent = `Модел ${item.id}`;
-  lightbox.showModal();
+  document.querySelector('#previewPosition').textContent = `${previewModels.findIndex(model => model.id === item.id) + 1} / ${previewModels.length}`;
+  document.querySelector('#previousModel').disabled = previewModels.length < 2;
+  document.querySelector('#nextModel').disabled = previewModels.length < 2;
+  if (opening) lightbox.showModal();
   lightbox.querySelector('.preview-content').scrollTop = 0;
-  lightbox.querySelector('button').focus({ preventScroll: true });
+  if (opening) lightbox.querySelector('.close-preview').focus({ preventScroll: true });
 }
 
 function render(append = false) {
-  const query = search.value.trim().toLocaleLowerCase('bg');
-  const matches = catalogue.filter(item => (activeCategory === 'Всички' || item.category === activeCategory) && `${item.title} ${item.category} ${item.id}`.toLocaleLowerCase('bg').includes(query));
+  const matches = filteredModels();
   filters.querySelectorAll('button').forEach(button => {
     const selected = button.dataset.category === activeCategory;
     button.classList.toggle('active', selected);
@@ -276,11 +298,13 @@ function render(append = false) {
     save.addEventListener('click', () => toggleSelection(item));
     card.append(button, save, createQuantityControl(item, 'card'));
     gallery.append(card);
+    revealObserver?.observe(card);
   });
   syncQuantityControls();
   document.querySelector('#resultCount').textContent = `${Math.min(limit, matches.length)} от ${matches.length} предложения · ${activeCategory}`;
   document.querySelector('.empty-state').hidden = matches.length > 0;
   loadMore.hidden = limit >= matches.length;
+  document.querySelector('#surpriseMe').disabled = matches.length === 0;
 }
 search.addEventListener('input', () => { limit = 6; render(); });
 loadMore.addEventListener('click', () => {
@@ -365,3 +389,60 @@ if ('IntersectionObserver' in window) {
 }
 const linkedModel = catalogueById.get(new URLSearchParams(window.location.search).get('model'));
 if (linkedModel) openPreview(linkedModel, document.querySelector('#selectionTitle'));
+
+
+function navigatePreview(direction) {
+  if (!lightbox.open || previewModels.length < 2) return;
+  const index = previewModels.findIndex(item => item.id === previewItem.id);
+  openPreview(previewModels[(index + direction + previewModels.length) % previewModels.length], opener);
+}
+document.querySelector('#previousModel').addEventListener('click', () => navigatePreview(-1));
+document.querySelector('#nextModel').addEventListener('click', () => navigatePreview(1));
+lightbox.addEventListener('keydown', event => {
+  if (event.target.closest('input, textarea, select, .quantity-control')) return;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    navigatePreview(event.key === 'ArrowLeft' ? -1 : 1);
+  }
+});
+let swipeStart = null;
+const previewImageArea = lightbox.querySelector('.preview-image');
+previewImageArea.addEventListener('touchstart', event => {
+  swipeStart = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+}, { passive: true });
+previewImageArea.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
+previewImageArea.addEventListener('touchend', event => {
+  if (!swipeStart || event.touches.length || !event.changedTouches.length) { swipeStart = null; return; }
+  const dx = event.changedTouches[0].clientX - swipeStart.x;
+  const dy = event.changedTouches[0].clientY - swipeStart.y;
+  swipeStart = null;
+  if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5) navigatePreview(dx < 0 ? 1 : -1);
+}, { passive: true });
+document.querySelector('#surpriseMe').addEventListener('click', event => {
+  const matches = filteredModels();
+  if (!matches.length) return;
+  const choices = matches.length > 1 ? matches.filter(item => item.id !== lastSurprise) : matches;
+  const item = choices[Math.floor(Math.random() * choices.length)];
+  lastSurprise = item.id;
+  openPreview(item, event.currentTarget);
+});
+if ('IntersectionObserver' in window) {
+  const animations = new Set();
+  revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      revealObserver.unobserve(entry.target);
+      if (reducedMotion.matches || !entry.target.animate) return;
+      const animation = entry.target.animate([
+        { opacity: .4, translate: '0 16px' },
+        { opacity: 1, translate: '0 0' }
+      ], { duration: 420, easing: 'ease-out' });
+      animations.add(animation);
+      animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
+    });
+  }, { threshold: .12 });
+  document.querySelectorAll('.catalogue-card, .pink-paper, .about-copy, .note, .contact-form').forEach(element => revealObserver.observe(element));
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) animations.forEach(animation => animation.cancel());
+  });
+}

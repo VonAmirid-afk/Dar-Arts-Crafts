@@ -42,7 +42,7 @@
     <div class="catalogue-band"><span class="band-doodle doodle" aria-hidden="true"><svg viewBox="0 0 160 90"><path d="M8 60Q40 0 59 45T110 30T151 18M124 12l28 5-12 25"/></svg></span><section class="collection wrap" id="collection" aria-labelledby="collectionTitle">
       <div class="section-heading"><div><p class="eyebrow">МАЛКА КОЛЕКЦИЯ ОТ ГОЛЕМИ ЕМОЦИИ</p><h2 id="collectionTitle">За всеки твой <span class="underline">повод.</span></h2></div><p>Разгледай, запази си идея, вдъхнови се.<br>Всеки детайл разказва различна история.</p></div>
       <div class="catalogue-tools"><div class="filters" role="group" aria-label="Филтрирай по повод"></div><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="catalogueSearch" placeholder="Потърси вдъхновение…" aria-label="Търси в каталога"></label></div>
-      <p class="result-count" id="resultCount" role="status" aria-live="polite"></p>
+      <div class="discovery-row"><p class="result-count" id="resultCount" role="status" aria-live="polite"></p><button type="button" id="surpriseMe" class="surprise-button">Изненадай ме <span aria-hidden="true">↗</span></button></div>
       <div class="gallery" id="gallery"></div>
       <p class="empty-state" hidden>Няма намерени предложения. Опитай с друг повод или дума.</p>
       <div class="load-more"><button class="button button-outline" id="loadMore" type="button">Още малко вдъхновение <span aria-hidden="true">↓</span></button></div>
@@ -82,8 +82,10 @@
   <dialog class="lightbox" id="lightbox" aria-labelledby="previewTitle">
     <div class="preview-toolbar"><span>Детайли на модела</span><button class="close-preview" type="button" aria-label="Затвори прегледа"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div>
     <div class="preview-content"><div class="preview-image"><img alt="" decoding="async"><p class="preview-status" role="status" aria-live="polite"></p></div><div class="preview-copy"><p class="eyebrow" id="previewCategory"></p><h2 id="previewTitle"></h2><p id="previewDescription"></p><p class="preview-id"></p><button type="button" class="save-choice preview-save" id="previewSave" aria-pressed="false">Добави към избраните</button><p class="preview-note">Модел от каталога на ДАР. Вдъхновение за твоя личен жест.</p></div></div>
+    <nav class="preview-navigation" aria-label="Разгледай още модели"><button type="button" id="previousModel" aria-label="Предишен модел">← <span>Назад</span></button><span id="previewPosition" role="status" aria-live="polite"></span><button type="button" id="nextModel" aria-label="Следващ модел"><span>Напред</span> →</button></nav>
   </dialog>
   <a class="selection-shortcut" id="selectionShortcut" href="#selectionTitle" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Твоят избор <b id="shortcutCount">0</b></span><span aria-hidden="true">↗</span></a>
+  <div id="selectionToast" class="selection-toast" aria-hidden="true"></div>
   <p class="selection-announcement sr-only" role="status" aria-live="polite"></p>
   <script src="catalogue.js"></script><script src="app.js"></script>
 </body>
