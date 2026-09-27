@@ -14,7 +14,7 @@ Product data lives in `catalogue.js`. The website serves responsive WebP images 
 
 ## Browsing
 
-Product previews support previous/next controls, keyboard arrows, and horizontal swipes on the image. Navigation and the surprise button follow the active category/search. Scroll reveals respect reduced-motion preferences and require no animation library.
+Product previews support previous/next controls, keyboard arrows, and horizontal swipes on the image. Navigation and the surprise button follow the active category/search. Scroll reveals, hand-drawn scribbles, floating paper shapes, pointer-responsive collage/card tilt, and save confetti respect reduced-motion preferences and require no animation library. Decorative loops pause offscreen, and particle bursts are removed after 750 ms.
 
 ## Saved selections
 

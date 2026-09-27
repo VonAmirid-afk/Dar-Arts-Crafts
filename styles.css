@@ -453,3 +453,27 @@ body:has(.selection-shortcut:not([hidden])) footer{padding-bottom:100px}
   .logo:hover .star-icon{transform:rotate(45deg)}
 }
 @media(max-width:360px){.discovery-row{gap:8px}.surprise-button{font-size:12px;gap:6px;padding-left:0}.discovery-row .result-count{font-size:9px}}
+
+/* Playful paper effects; ambient motion runs only while visible. */
+.paper-burst{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}
+.lightbox>.paper-burst{position:absolute}
+.paper-burst i{position:absolute;display:block;width:8px;height:12px;pointer-events:none}
+@keyframes paper-drift{from{translate:0 0}to{translate:0 -12px}}
+@keyframes star-sway{from{rotate:-9deg}to{rotate:15deg}}
+@keyframes sticker-sway{from{rotate:-4deg}to{rotate:5deg}}
+@media(prefers-reduced-motion:no-preference){
+  .hero-art .shape-yellow{animation:paper-drift 4s ease-in-out infinite alternate;animation-play-state:paused}
+  .hero-art .art-sticker{animation:sticker-sway 3.5s ease-in-out infinite alternate;animation-play-state:paused}
+  .little-star .star-icon,.about-sun .star-icon,.closing-flower .star-icon{animation:star-sway 5s ease-in-out infinite alternate;animation-play-state:paused}
+  .hero-art.effect-in-view .shape-yellow,.hero-art.effect-in-view .art-sticker,.effect-in-view>.star-icon{animation-play-state:running}
+  .effects-paused .shape-yellow,.effects-paused .art-sticker,.effects-paused .star-icon{animation-play-state:paused!important}
+  .hero-photo{translate:var(--collage-x,0px) var(--collage-y,0px);transition:translate .22s ease-out}
+  .button,.save-choice,.surprise-button{position:relative;overflow:hidden}
+  .button:after,.save-choice:after{content:"";position:absolute;top:-30%;bottom:-30%;left:-60%;width:35%;background:linear-gradient(90deg,transparent,#ffffff40,transparent);transform:skewX(-20deg);pointer-events:none;transition:left .5s}
+  .button:hover:after,.save-choice:hover:after{left:130%}
+  .button:active,.save-choice:active{scale:.97}
+}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .catalogue-card .piece-image{transform:perspective(750px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .2s ease-out,box-shadow .2s}
+  .catalogue-card .piece:hover .piece-image{box-shadow:7px 10px 0 #dcc7b3}
+}

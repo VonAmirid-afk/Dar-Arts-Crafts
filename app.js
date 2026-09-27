@@ -169,7 +169,7 @@ function syncSelection() {
   syncQuantityControls();
   if (document.querySelector('#enquiryText').value) document.querySelector('#enquiryText').value = buildEnquiry().body;
 }
-function toggleSelection(item) {
+function toggleSelection(item, trigger) {
   if (selectedModels.has(item.id)) selectedModels.delete(item.id);
   else selectedModels.set(item.id, 1);
   try { localStorage.setItem(selectionStorageKey, JSON.stringify([...selectedModels])); } catch { /* Keep the in-memory selection. */ }
@@ -181,8 +181,9 @@ function toggleSelection(item) {
   toast.classList.add('visible');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('visible'), 2400);
+  if (selectedModels.has(item.id) && trigger) celebrateSelection(trigger);
 }
-previewSave.addEventListener('click', () => { if (previewItem) toggleSelection(previewItem); });
+previewSave.addEventListener('click', () => { if (previewItem) toggleSelection(previewItem, previewSave); });
 window.addEventListener('storage', event => {
   if (event.key === selectionStorageKey || event.key === null) {
     selectedModels = readSelection(event.key === null ? null : event.newValue);
@@ -295,7 +296,7 @@ function render(append = false) {
     save.type = 'button';
     save.className = 'save-choice';
     setChoiceButton(save, item);
-    save.addEventListener('click', () => toggleSelection(item));
+    save.addEventListener('click', () => toggleSelection(item, save));
     card.append(button, save, createQuantityControl(item, 'card'));
     gallery.append(card);
     revealObserver?.observe(card);
@@ -445,4 +446,121 @@ if ('IntersectionObserver' in window) {
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches) animations.forEach(animation => animation.cancel());
   });
+}
+
+
+// Small transform-only effects, with bounded particles and no scroll event loop.
+const effectAnimations = new Set();
+function playEffect(element, frames, options) {
+  if (reducedMotion.matches || !element.animate) return null;
+  const animation = element.animate(frames, options);
+  effectAnimations.add(animation);
+  animation.finished.then(() => effectAnimations.delete(animation), () => effectAnimations.delete(animation));
+  return animation;
+}
+function celebrateSelection(button) {
+  if (reducedMotion.matches || document.hidden) return;
+  document.querySelectorAll('.paper-burst').forEach(layer => layer.remove());
+  const host = button.closest('dialog') || document.body;
+  const bounds = button.getBoundingClientRect();
+  const offset = host === document.body ? { left: 0, top: 0 } : host.getBoundingClientRect();
+  const layer = document.createElement('div');
+  layer.className = 'paper-burst';
+  layer.setAttribute('aria-hidden', 'true');
+  host.append(layer);
+  for (let i = 0; i < 12; i++) {
+    const piece = document.createElement('i');
+    piece.style.left = `${bounds.left + bounds.width / 2 - offset.left}px`;
+    piece.style.top = `${bounds.top + Math.min(bounds.height / 2, 22) - offset.top}px`;
+    piece.style.background = ['#f46b45', '#f8ced8', '#ffbd38', '#252323'][i % 4];
+    piece.style.borderRadius = i % 3 === 0 ? '50%' : '1px';
+    layer.append(piece);
+    const angle = (i / 12) * Math.PI * 2;
+    const distance = 42 + Math.random() * 52;
+    playEffect(piece, [
+      { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance - 28}px) rotate(${i * 37}deg)`, opacity: .9, offset: .65 },
+      { transform: `translate(${Math.cos(angle) * distance * 1.15}px, ${Math.sin(angle) * distance + 20}px) rotate(${i * 53}deg)`, opacity: 0 }
+    ], { duration: 650, easing: 'ease-out' });
+  }
+  playEffect(button, [{ scale: '1' }, { scale: '1.035', offset: .4 }, { scale: '1' }], { duration: 250 });
+  setTimeout(() => layer.remove(), 750);
+}
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+const heroArt = document.querySelector('.hero-art');
+let tiltTarget = null;
+let tiltFrame = 0;
+let pointerPosition = null;
+function resetTilt() {
+  if (tiltFrame) cancelAnimationFrame(tiltFrame);
+  tiltFrame = 0;
+  tiltTarget?.style.removeProperty('--tilt-x');
+  tiltTarget?.style.removeProperty('--tilt-y');
+  tiltTarget = null;
+  heroArt.style.removeProperty('--collage-x');
+  heroArt.style.removeProperty('--collage-y');
+}
+function queueTilt(event, target, hero = false) {
+  if (reducedMotion.matches || !finePointer.matches || event.pointerType !== 'mouse') return;
+  pointerPosition = { x: event.clientX, y: event.clientY, target, hero };
+  if (tiltFrame) return;
+  tiltFrame = requestAnimationFrame(() => {
+    tiltFrame = 0;
+    const { x, y, target, hero } = pointerPosition;
+    const bounds = (hero ? heroArt : target.closest('.piece')).getBoundingClientRect();
+    const dx = Math.max(-1, Math.min(1, (x - bounds.left) / bounds.width * 2 - 1));
+    const dy = Math.max(-1, Math.min(1, (y - bounds.top) / bounds.height * 2 - 1));
+    if (hero) {
+      heroArt.style.setProperty('--collage-x', `${dx * 9}px`);
+      heroArt.style.setProperty('--collage-y', `${dy * 7}px`);
+    } else {
+      if (tiltTarget !== target) {
+        tiltTarget?.style.removeProperty('--tilt-x');
+        tiltTarget?.style.removeProperty('--tilt-y');
+      }
+      tiltTarget = target;
+      target.style.setProperty('--tilt-x', `${-dy * 4}deg`);
+      target.style.setProperty('--tilt-y', `${dx * 4}deg`);
+    }
+  });
+}
+heroArt.addEventListener('pointermove', event => queueTilt(event, heroArt, true));
+heroArt.addEventListener('pointerleave', resetTilt);
+gallery.addEventListener('pointermove', event => {
+  const frame = event.target.closest('.piece-image');
+  if (frame) queueTilt(event, frame);
+  else resetTilt();
+});
+gallery.addEventListener('pointerleave', resetTilt);
+finePointer.addEventListener('change', resetTilt);
+reducedMotion.addEventListener('change', () => {
+  if (!reducedMotion.matches) return;
+  resetTilt();
+  effectAnimations.forEach(animation => animation.cancel());
+  document.querySelectorAll('.paper-burst').forEach(layer => layer.remove());
+});
+document.addEventListener('visibilitychange', () => {
+  document.body.classList.toggle('effects-paused', document.hidden);
+  if (document.hidden) resetTilt();
+});
+if ('IntersectionObserver' in window) {
+  const ambientObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => entry.target.classList.toggle('effect-in-view', entry.isIntersecting));
+  });
+  document.querySelectorAll('.hero-art, .little-star, .about-sun, .closing-flower').forEach(element => ambientObserver.observe(element));
+  const drawingObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      drawingObserver.unobserve(entry.target);
+      if (reducedMotion.matches) return;
+      entry.target.querySelectorAll('path').forEach(path => {
+        const length = path.getTotalLength();
+        playEffect(path, [
+          { strokeDasharray: `${length}`, strokeDashoffset: `${length}` },
+          { strokeDasharray: `${length}`, strokeDashoffset: '0' }
+        ], { duration: 1050, easing: 'ease-in-out' });
+      });
+    });
+  }, { threshold: .5 });
+  document.querySelectorAll('.scribble, .doodle').forEach(element => drawingObserver.observe(element));
 }
