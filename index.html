@@ -59,12 +59,19 @@
       <div class="contact-inner wrap">
         <div class="contact-copy"><p class="eyebrow">ЕДИН ХУБАВ ЖЕСТ ЗАПОЧВА С РАЗГОВОР</p><h2 id="contactTitle">Имаш идея?<br>Нека ѝ дадем <span class="underline">форма.</span></h2><p>Разкажи ни за човека, повода или модела, който ти е харесал. Ще се радваме да чуем твоята история.</p><span class="contact-stamp">малко хартия<br>много обич ♡</span><svg class="contact-arrow doodle" viewBox="0 0 180 100" aria-hidden="true"><path d="M10 20C65 5 22 93 90 64s49-27 71-15M142 30l22 20-26 18"/></svg></div>
         <form id="contactForm" class="contact-form">
+          <section class="enquiry-selection" aria-labelledby="selectionTitle">
+            <div class="selection-heading"><h3 id="selectionTitle" tabindex="-1">Твоят избор <span id="selectionCount">0</span></h3></div>
+            <p class="selection-help">Събери моделите, които ти харесват. Ще ги включим в запитването ти.</p>
+            <ul id="selectionList" class="selection-list"></ul>
+            <p id="selectionEmpty" class="selection-empty">Още нямаш избрани модели. <a href="#collection">Разгледай каталога ↗</a></p>
+          </section>
           <div class="form-row"><label for="contactName">Твоето име <span aria-hidden="true">*</span><input id="contactName" name="name" autocomplete="name" placeholder="Как да се обръщаме към теб?" maxlength="100" required></label><label for="contactEmail">Имейл за отговор <span aria-hidden="true">*</span><input id="contactEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label></div>
           <label for="contactOccasion">Повод или модел <span class="optional">/ по желание</span><input id="contactOccasion" name="occasion" placeholder="Рожден ден, сватба или DAR-001…" maxlength="150"></label>
-          <label for="contactMessage">Твоята идея <span aria-hidden="true">*</span><textarea id="contactMessage" name="message" rows="4" placeholder="За кого е? Какво искаш да кажеш с този малък жест?" maxlength="3000" required></textarea></label>
+          <label for="contactMessage">Твоята идея <span id="messageRequirement">*</span><textarea id="contactMessage" name="message" rows="4" placeholder="За кого е? Какво искаш да кажеш с този малък жест?" maxlength="3000" required></textarea></label>
           <button class="button" type="submit">Продължи към имейл <span aria-hidden="true">↗</span></button>
           <p class="form-help" id="formHelp">Формата подготвя писмо в твоето приложение за имейл. Изпращаш го оттам.</p>
           <p class="form-status" role="status" aria-live="polite"></p>
+          <details class="email-fallback"><summary>Копирай запитването</summary><p>Ако приложението за имейл не се отвори, подготви текста тук и го копирай в ново писмо.</p><button type="button" class="button button-outline" id="copyEnquiry">Подготви и копирай текста</button><label for="enquiryText">Текст на запитването<textarea id="enquiryText" readonly rows="6"></textarea></label><p id="copyStatus" role="status" aria-live="polite"></p></details>
         </form>
       </div>
       <span class="contact-scribble doodle" aria-hidden="true"><svg viewBox="0 0 170 100"><path d="m12 76 23-53 7 59 27-66 6 65 31-60 3 59 30-63 13 61"/></svg></span>
@@ -74,8 +81,10 @@
   <footer class="wrap"><a class="logo" href="#top" aria-label="ДАР, начало">дар<span aria-hidden="true"><svg class="star-icon" viewBox="0 0 100 100" fill="none" aria-hidden="true" focusable="false"><path d="M50 6v88M6 50h88M19 19l62 62M19 81l62-62" stroke="currentColor" stroke-width="8"/></svg></span></a><p>Ръчно изработени жестове, събрани в един каталог.</p><p>© 2026 ДАР</p><a href="#top" aria-label="Обратно в началото">↑</a></footer>
   <dialog class="lightbox" id="lightbox" aria-labelledby="previewTitle">
     <div class="preview-toolbar"><span>Детайли на модела</span><button class="close-preview" type="button" aria-label="Затвори прегледа"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div>
-    <div class="preview-content"><div class="preview-image"><img alt="" decoding="async"><p class="preview-status" role="status" aria-live="polite"></p></div><div class="preview-copy"><p class="eyebrow" id="previewCategory"></p><h2 id="previewTitle"></h2><p id="previewDescription"></p><p class="preview-id"></p><p class="preview-note">Модел от каталога на ДАР. Вдъхновение за твоя личен жест.</p></div></div>
+    <div class="preview-content"><div class="preview-image"><img alt="" decoding="async"><p class="preview-status" role="status" aria-live="polite"></p></div><div class="preview-copy"><p class="eyebrow" id="previewCategory"></p><h2 id="previewTitle"></h2><p id="previewDescription"></p><p class="preview-id"></p><button type="button" class="save-choice preview-save" id="previewSave" aria-pressed="false">Добави към избраните</button><p class="preview-note">Модел от каталога на ДАР. Вдъхновение за твоя личен жест.</p></div></div>
   </dialog>
+  <a class="selection-shortcut" id="selectionShortcut" href="#selectionTitle" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Твоят избор <b id="shortcutCount">0</b></span><span aria-hidden="true">↗</span></a>
+  <p class="selection-announcement sr-only" role="status" aria-live="polite"></p>
   <script src="catalogue.js"></script><script src="app.js"></script>
 </body>
 </html>
