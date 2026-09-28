@@ -97,8 +97,11 @@ function createQuantityControl(item, context) {
   group.append(minus, input, plus);
   return group;
 }
-function syncQuantityControls() {
-  document.querySelectorAll('.quantity-control').forEach(group => {
+function syncQuantityControls(modelId = null) {
+  const groups = modelId
+    ? document.querySelectorAll(`.quantity-control[data-model="${modelId}"]`)
+    : document.querySelectorAll('.quantity-control');
+  groups.forEach(group => {
     const count = selectedModels.get(group.dataset.model);
     group.hidden = !count;
     group.querySelector('input').value = count || 1;
@@ -111,14 +114,17 @@ function changeQuantity(item, value, context, action) {
   const valid = Number.isInteger(value) && value >= 1 && value <= 999;
   if (valid) selectedModels.set(item.id, value);
   try { localStorage.setItem(selectionStorageKey, JSON.stringify([...selectedModels])); } catch { /* Keep quantities in memory. */ }
-  syncSelection();
+  syncSelection(item.id, false);
   const group = document.querySelector(`.quantity-control[data-model="${item.id}"][data-context="${context}"]`);
   const control = group?.querySelector(`[data-action="${action}"]`);
   (control?.disabled ? group.querySelector('input') : control)?.focus({ preventScroll: true });
   document.querySelector('.selection-announcement').textContent = valid ? `${item.id}: ${value} бр.` : 'Въведи цяло число от 1 до 999. Предишният брой е запазен.';
 }
-function syncSelection() {
-  document.querySelectorAll('.save-choice[data-model]').forEach(button => setChoiceButton(button, catalogueById.get(button.dataset.model)));
+function syncSelection(changedModel = null, rebuildList = true) {
+  const buttons = changedModel
+    ? document.querySelectorAll(`.save-choice[data-model="${changedModel}"]`)
+    : document.querySelectorAll('.save-choice[data-model]');
+  buttons.forEach(button => setChoiceButton(button, catalogueById.get(button.dataset.model)));
   document.querySelector('#selectionCount').textContent = selectedModels.size;
   document.querySelector('#shortcutCount').textContent = selectedModels.size;
   updateSelectionShortcut();
@@ -127,8 +133,9 @@ function syncSelection() {
   document.querySelector('#messageRequirement').textContent = selectedModels.size ? '/ по желание' : '*';
   const list = document.querySelector('#selectionList');
   const listScroll = list.scrollTop;
-  list.replaceChildren();
-  [...selectedModels.keys()].forEach((id, index) => {
+  if (rebuildList) {
+    list.replaceChildren();
+    [...selectedModels.keys()].forEach((id, index) => {
     const item = catalogueById.get(id);
     const row = document.createElement('li');
     const view = document.createElement('button');
@@ -163,10 +170,11 @@ function syncSelection() {
     controls.className = 'selection-controls';
     controls.append(createQuantityControl(item, 'selection'), remove);
     row.append(view, controls);
-    list.append(row);
-  });
-  list.scrollTop = listScroll;
-  syncQuantityControls();
+      list.append(row);
+    });
+    list.scrollTop = listScroll;
+  }
+  syncQuantityControls(changedModel);
   if (document.querySelector('#enquiryText').value) document.querySelector('#enquiryText').value = buildEnquiry().body;
 }
 function toggleSelection(item, trigger) {
@@ -272,6 +280,7 @@ function render(append = false) {
     img.alt = item.title;
     img.loading = 'lazy';
     img.decoding = 'async';
+    img.fetchPriority = 'low';
     const zoom = document.createElement('span');
     zoom.className = 'piece-zoom';
     zoom.textContent = '↗';
@@ -453,6 +462,7 @@ if ('IntersectionObserver' in window) {
 const effectAnimations = new Set();
 function playEffect(element, frames, options) {
   if (reducedMotion.matches || !element.animate) return null;
+  if (document.hidden) return null;
   const animation = element.animate(frames, options);
   effectAnimations.add(animation);
   animation.finished.then(() => effectAnimations.delete(animation), () => effectAnimations.delete(animation));
@@ -541,7 +551,12 @@ reducedMotion.addEventListener('change', () => {
 });
 document.addEventListener('visibilitychange', () => {
   document.body.classList.toggle('effects-paused', document.hidden);
-  if (document.hidden) resetTilt();
+  if (document.hidden) {
+    resetTilt();
+    effectAnimations.forEach(animation => animation.pause());
+  } else {
+    effectAnimations.forEach(animation => { if (animation.playState === 'paused') animation.play(); });
+  }
 });
 if ('IntersectionObserver' in window) {
   const ambientObserver = new IntersectionObserver(entries => {

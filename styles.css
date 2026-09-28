@@ -477,3 +477,7 @@ body:has(.selection-shortcut:not([hidden])) footer{padding-bottom:100px}
   .catalogue-card .piece-image{transform:perspective(750px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .2s ease-out,box-shadow .2s}
   .catalogue-card .piece:hover .piece-image{box-shadow:7px 10px 0 #dcc7b3}
 }
+
+/* Defer rendering product cards that are well outside the viewport. */
+.catalogue-card{content-visibility:auto;contain-intrinsic-size:auto 580px}
+@media(max-width:700px){.catalogue-card{contain-intrinsic-size:auto 400px}}
