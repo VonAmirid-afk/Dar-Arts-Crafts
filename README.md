@@ -22,7 +22,9 @@ Visitors can save models from catalogue cards or previews, review/remove them be
 
 ## Email form
 
-The form sends enquiries through FormSubmit’s AJAX endpoint to `ydirimanov@gmail.com`, so visitors do not need to open an email application. FormSubmit requires the inbox owner to confirm its first activation email before it starts delivering submissions. The form keeps a copy-text fallback for service or network errors. Contact details are not saved by this site.
+The form sends enquiries to `ydirimanov@gmail.com` through a standard FormSubmit POST with CAPTCHA enabled. After completing the verification, visitors return to `thank-you.html` and receive a polite Bulgarian automatic acknowledgement with a copy of their submission. FormSubmit does not support automatic replies through AJAX or with CAPTCHA disabled. The acknowledgement confirms receipt of an enquiry, not an order.
+
+FormSubmit requires the inbox owner to confirm its first activation email before it starts delivering submissions. The copy-text fallback remains available. Contact details are not saved by this site.
 
 ## Publishing
 

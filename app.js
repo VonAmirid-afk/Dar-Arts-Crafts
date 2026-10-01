@@ -379,27 +379,34 @@ contactForm.addEventListener('submit', event => {
     _replyto: formData.get('email').trim(),
     _subject: subject,
     _honey: formData.get('_honey') || '',
+    _captcha: 'true',
+    _next: new URL('thank-you.html', window.location.href).href,
+    _autoresponse: 'Здравейте!\n\nБлагодарим Ви, че се свързахте с ДАР! Получихме Вашето запитване и ще го разгледаме с внимание. Ще Ви отговорим на посочения имейл възможно най-скоро, за да обсъдим Вашата идея и детайлите.\n\nТова е автоматично потвърждение за получено запитване.\n\nС най-добри пожелания,\nДАР — малки жестове, големи чувства',
     occasion: formData.get('occasion').trim() || 'Не е посочен',
     message: body
   };
   document.querySelector('#enquiryText').value = body;
   submitButton.disabled = true;
-  status.textContent = 'Изпращаме запитването…';
-  fetch(`https://formsubmit.co/ajax/${encodeURIComponent(contactEmail)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(async response => {
-    const result = await response.json();
-    if (!response.ok || (result.success !== true && result.success !== 'true')) throw new Error(result.message || 'Изпращането не успя.');
-    status.textContent = 'Запитването е изпратено успешно. Ще ти отговорим на посочения имейл.';
-    contactForm.reset();
-    syncSelection();
-  }).catch(() => {
-    status.textContent = 'Не успяхме да изпратим запитването. Опитай отново или използвай „Копирай запитването“.';
-  }).finally(() => {
-    submitButton.disabled = false;
-  });
+  status.textContent = 'Продължаваме към потвърждение и изпращане…';
+  // Auto replies require a standard POST with FormSubmit's CAPTCHA enabled.
+  const submission = document.createElement('form');
+  submission.method = 'POST';
+  submission.action = `https://formsubmit.co/${encodeURIComponent(contactEmail)}`;
+  submission.hidden = true;
+  for (const [name, value] of Object.entries(payload)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    submission.append(input);
+  }
+  document.body.append(submission);
+  HTMLFormElement.prototype.submit.call(submission);
+  submission.remove();
+});
+window.addEventListener('pageshow', () => {
+  contactForm.querySelector('[type="submit"]').disabled = false;
+  contactForm.querySelector('.form-status').textContent = '';
 });
 document.querySelector('#copyEnquiry').addEventListener('click', async () => {
   if (!validateEnquiry()) return;
