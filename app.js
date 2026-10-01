@@ -339,8 +339,7 @@ lightbox.addEventListener('close', () => {
 });
 render();
 
-// Replace this reserved example address with the real inbox before publishing.
-const contactEmail = 'hello@dar.example';
+const contactEmail = 'ydirimanov@gmail.com';
 const contactForm = document.querySelector('#contactForm');
 function buildEnquiry() {
   const data = new FormData(contactForm);
@@ -368,11 +367,39 @@ function validateEnquiry() {
 }
 contactForm.addEventListener('submit', event => {
   event.preventDefault();
+  if (contactForm.querySelector('[type="submit"]').disabled) return;
   if (!validateEnquiry()) return;
-  const { subject, body } = buildEnquiry();
+  const { name, subject, body } = buildEnquiry();
+  const status = contactForm.querySelector('.form-status');
+  const submitButton = contactForm.querySelector('[type="submit"]');
+  const formData = new FormData(contactForm);
+  const payload = {
+    name,
+    email: formData.get('email').trim(),
+    _replyto: formData.get('email').trim(),
+    _subject: subject,
+    _honey: formData.get('_honey') || '',
+    occasion: formData.get('occasion').trim() || 'Не е посочен',
+    message: body
+  };
   document.querySelector('#enquiryText').value = body;
-  window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  contactForm.querySelector('.form-status').textContent = 'Запитването с избраните модели е подготвено за твоето приложение за имейл. Ако не се отвори, използвай „Копирай запитването“. Съобщението още не е изпратено.';
+  submitButton.disabled = true;
+  status.textContent = 'Изпращаме запитването…';
+  fetch(`https://formsubmit.co/ajax/${encodeURIComponent(contactEmail)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(async response => {
+    const result = await response.json();
+    if (!response.ok || (result.success !== true && result.success !== 'true')) throw new Error(result.message || 'Изпращането не успя.');
+    status.textContent = 'Запитването е изпратено успешно. Ще ти отговорим на посочения имейл.';
+    contactForm.reset();
+    syncSelection();
+  }).catch(() => {
+    status.textContent = 'Не успяхме да изпратим запитването. Опитай отново или използвай „Копирай запитването“.';
+  }).finally(() => {
+    submitButton.disabled = false;
+  });
 });
 document.querySelector('#copyEnquiry').addEventListener('click', async () => {
   if (!validateEnquiry()) return;

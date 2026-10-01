@@ -18,11 +18,11 @@ Product previews support previous/next controls, keyboard arrows, and horizontal
 
 ## Saved selections
 
-Visitors can save models from catalogue cards or previews, review/remove them beside the enquiry form, and include them in an email. Model IDs and requested quantities are stored in localStorage; form contact details are not persisted. Visitors can adjust quantities on cards, in previews, or beside the form. Email enquiries include quantities, model titles, codes, and direct `?model=DAR-001` links. A copy-text fallback is available if a mail application does not open. There is no checkout, payment, or order placement.
+Visitors can save models from catalogue cards or previews, review/remove them beside the enquiry form, and include them in an email. Model IDs and requested quantities are stored in localStorage; form contact details are not persisted. Visitors can adjust quantities on cards, in previews, or beside the form. Email enquiries include quantities, model titles, codes, and direct `?model=DAR-001` links. A copy-text fallback is available if submission fails. There is no checkout, payment, or order placement.
 
 ## Email form
 
-The form prepares a draft in the visitor’s email application. Replace the placeholder `hello@dar.example` in `app.js` with a real inbox before accepting enquiries. No messages are submitted to a server.
+The form sends enquiries through FormSubmit’s AJAX endpoint to `ydirimanov@gmail.com`, so visitors do not need to open an email application. FormSubmit requires the inbox owner to confirm its first activation email before it starts delivering submissions. The form keeps a copy-text fallback for service or network errors. Contact details are not saved by this site.
 
 ## Publishing
 
