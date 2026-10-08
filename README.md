@@ -10,7 +10,7 @@ Run `python -m http.server 8000` and open http://localhost:8000.
 
 ## Updating the catalogue
 
-Product data lives in `catalogue.js`. The website serves responsive WebP images from `media/`; original photos remain in `images/` and the old thumbnails in `thumbs/` for reference. Run `python scripts/optimize-images.py` (requires ImageMagick) to regenerate the three image sizes and their metadata. Typography is bundled locally in `fonts/` with its license.
+Product data lives in `catalogue.js`. The website serves responsive WebP images from `media/`; original photos remain in `images/` and the old thumbnails in `thumbs/` for reference. Run `python scripts/optimize-images.py` (requires ImageMagick) to regenerate the three image sizes and their metadata. Typography uses locally bundled Oswald for uppercase headings and Manrope for body text, with their licenses in `fonts/`.
 
 ## Browsing
 
@@ -29,3 +29,12 @@ FormSubmit requires the inbox owner to confirm its first activation email before
 ## Publishing
 
 GitHub Pages publishes the root of the `main` branch. Push changes to `main` to update the website.
+
+
+## Editorial pages
+
+- `creator.html`: the creator story. Мила and the biography are draft copy requested for the design; replace them with the real creator details before treating them as factual.
+- `materials.html`: paper, card, decorative materials, and care guidance. Material descriptions are draft copy to confirm with the creator.
+- `how-it-works.html`: enquiry steps and an accessible FAQ about personalization, timing, pricing, payment, and receiving the work.
+
+All pages share `styles.css` and `site.js` for typography and responsive navigation. The homepage links to all three pages. The catalogue and enquiry form still use `app.js`.

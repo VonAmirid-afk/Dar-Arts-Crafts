@@ -1,17 +1,3 @@
-const menuButton = document.querySelector('.menu-button');
-const mobileNav = document.querySelector('#mobileNav');
-function setMenu(open) {
-  menuButton.setAttribute('aria-expanded', String(open));
-  menuButton.setAttribute('aria-label', open ? 'Затвори менюто' : 'Отвори менюто');
-  mobileNav.hidden = !open;
-}
-menuButton.addEventListener('click', () => setMenu(mobileNav.hidden));
-mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
-window.addEventListener('resize', () => { if (window.innerWidth > 700) setMenu(false); });
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && !mobileNav.hidden) { setMenu(false); menuButton.focus(); }
-});
-
 const gallery = document.querySelector('#gallery');
 const filters = document.querySelector('.filters');
 const search = document.querySelector('#catalogueSearch');
@@ -136,41 +122,41 @@ function syncSelection(changedModel = null, rebuildList = true) {
   if (rebuildList) {
     list.replaceChildren();
     [...selectedModels.keys()].forEach((id, index) => {
-    const item = catalogueById.get(id);
-    const row = document.createElement('li');
-    const view = document.createElement('button');
-    view.type = 'button';
-    view.className = 'selection-view';
-    view.setAttribute('aria-label', `Разгледай ${item.title}, ${id}`);
-    const img = document.createElement('img');
-    img.src = mediaPath(item, 480);
-    img.alt = '';
-    img.width = 52;
-    img.height = 64;
-    img.loading = 'lazy';
-    const text = document.createElement('span');
-    const title = document.createElement('strong');
-    title.textContent = item.title;
-    const code = document.createElement('small');
-    code.textContent = id;
-    text.append(title, code);
-    view.append(img, text);
-    view.addEventListener('click', () => openPreview(item, view));
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'remove-choice';
-    remove.textContent = 'Премахни';
-    remove.setAttribute('aria-label', `Премахни ${item.title}, ${id}`);
-    remove.addEventListener('click', () => {
-      toggleSelection(item);
-      const remaining = list.querySelectorAll('.remove-choice');
-      (remaining[Math.min(index, remaining.length - 1)] || document.querySelector('#selectionTitle')).focus({ preventScroll: true });
-    });
-    const controls = document.createElement('div');
-    controls.className = 'selection-controls';
-    controls.append(createQuantityControl(item, 'selection'), remove);
-    row.append(view, controls);
-      list.append(row);
+      const item = catalogueById.get(id);
+      const row = document.createElement('li');
+      const view = document.createElement('button');
+      view.type = 'button';
+      view.className = 'selection-view';
+      view.setAttribute('aria-label', `Разгледай ${item.title}, ${id}`);
+      const img = document.createElement('img');
+      img.src = mediaPath(item, 480);
+      img.alt = '';
+      img.width = 52;
+      img.height = 64;
+      img.loading = 'lazy';
+      const text = document.createElement('span');
+      const title = document.createElement('strong');
+      title.textContent = item.title;
+      const code = document.createElement('small');
+      code.textContent = id;
+      text.append(title, code);
+      view.append(img, text);
+      view.addEventListener('click', () => openPreview(item, view));
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'remove-choice';
+      remove.textContent = 'Премахни';
+      remove.setAttribute('aria-label', `Премахни ${item.title}, ${id}`);
+      remove.addEventListener('click', () => {
+        toggleSelection(item);
+        const remaining = list.querySelectorAll('.remove-choice');
+        (remaining[Math.min(index, remaining.length - 1)] || document.querySelector('#selectionTitle')).focus({ preventScroll: true });
+      });
+      const controls = document.createElement('div');
+      controls.className = 'selection-controls';
+      controls.append(createQuantityControl(item, 'selection'), remove);
+      row.append(view, controls);
+        list.append(row);
     });
     list.scrollTop = listScroll;
   }
