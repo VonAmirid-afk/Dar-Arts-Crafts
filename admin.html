@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f8f5ef">
+  <title>Работилницата — ДАР</title>
+  <link rel="preload" href="fonts/manrope-variable.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/oswald-variable.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="admin.css">
+  <script src="catalogue.js" defer></script>
+  <script src="admin-core.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Към съдържанието</a>
+<aside class="sidebar">
+  <a class="brand" href="admin.html" aria-label="ДАР — работилницата">дар<span aria-hidden="true">✳</span><small>ТВОЯТА МАЛКА РАБОТИЛНИЦА</small></a>
+  <p class="nav-label">РАБОТНО ПРОСТРАНСТВО</p>
+  <nav aria-label="Администрация">
+    <a href="#overview" data-view="overview"><span aria-hidden="true">▦</span> Преглед</a>
+    <a href="#orders" data-view="orders"><span aria-hidden="true">▤</span> Поръчки <b id="navCount">0</b></a>
+    <a href="#production" data-view="production"><span aria-hidden="true">✂</span> За изработка</a>
+    <a href="#customers" data-view="customers"><span aria-hidden="true">♡</span> Клиенти</a>
+  </nav>
+  <div class="sidebar-note"><span aria-hidden="true">✳</span><p>Зад всяка поръчка<br>стои нечий <em>специален ден.</em></p></div>
+  <div class="sidebar-bottom"><a href="index.html">Към каталога <span aria-hidden="true">↗</span></a><small>ДАР · НАПРАВЕНО С ВНИМАНИЕ</small></div>
+</aside>
+<div class="workspace">
+  <header class="topbar"><div><span class="workspace-name">Работилницата</span><span class="top-divider">/</span><span id="breadcrumb">Преглед</span></div><div class="topbar-right"><span class="local-dot"></span><span>Локален тракер</span><span class="avatar" aria-label="ДАР">д</span></div></header>
+  <div class="mode-banner" id="modeBanner"><p><strong id="modeTitle">Примерни данни</strong><span id="modeDescription">Разгледай свободно — това не са реални поръчки.</span></p><button id="switchMode" class="text-button" type="button">Към моите поръчки ↗</button></div>
+  <main id="main" tabindex="-1">
+    <div class="page-heading"><div><p class="eyebrow" id="todayLabel"></p><h1 id="pageTitle">Малките неща.<br><span>Голямата картина.</span></h1><p id="pageSubtitle">Поръчки, планове и малко повече спокойствие.</p></div><div class="heading-actions"><button class="button secondary" id="exportCsv" type="button">Експорт CSV <span aria-hidden="true">↓</span></button><button class="button primary" id="newOrder" type="button"><span aria-hidden="true">＋</span> Нова поръчка</button></div></div>
+    <section id="view-overview" class="view" aria-label="Общ преглед">
+      <div class="section-title"><h2>В числа</h2><label class="period-label">Период <select id="period"><option value="month">Този месец</option><option value="30">Последните 30 дни</option><option value="all">Всички поръчки</option></select></label></div>
+      <div class="stats" id="stats"></div>
+      <div class="overview-grid">
+        <section class="panel sales-panel"><div class="panel-heading"><div><p class="eyebrow">МАЛКО ПО МАЛКО</p><h2>История на продажбите</h2></div><span class="soft-label">6 месеца · EUR</span></div><div class="chart-summary"><strong id="chartTotal"></strong><span>стойност на поръчките</span></div><div id="salesChart" class="sales-chart" role="img" aria-label="Месечна стойност на поръчките"></div><p class="panel-footnote">По дата на поръчката, без отказаните. Сумите не са печалба.</p></section>
+        <section class="panel workload-panel"><div class="panel-heading"><div><p class="eyebrow">ОТ ИДЕЯ ДО ПОДАРЪК</p><h2>В работилницата</h2></div><span class="tiny-star" aria-hidden="true">✳</span></div><div class="workload-content"><div class="donut" id="workloadRing"><div><strong id="activeTotal">0</strong><span>активни</span></div></div><div id="workloadLegend" class="legend"></div></div><a href="#production" class="panel-link">Отвори работния план <span aria-hidden="true">↗</span></a></section>
+        <section class="panel recent-panel"><div class="panel-heading"><div><p class="eyebrow">ВСЕКИ ДАР ИМА ИСТОРИЯ</p><h2>Последни поръчки</h2></div><a href="#orders" class="text-link">Виж всички ↗</a></div><div id="recentOrders"></div></section>
+        <section class="panel deadlines-panel"><div class="panel-heading"><div><p class="eyebrow">С ВНИМАНИЕ КЪМ СРОКА</p><h2>Следващи на ред</h2></div><span class="deadline-icon" aria-hidden="true">◷</span></div><div id="deadlines"></div><p class="panel-footnote">Незавършени поръчки, подредени по краен срок.</p></section>
+      </div>
+    </section>
+    <section id="view-orders" class="view" aria-label="Всички поръчки" hidden>
+      <div class="panel"><div class="order-tools"><label class="search"><span aria-hidden="true">⌕</span><input id="orderSearch" type="search" placeholder="Име, номер или модел…" aria-label="Търси поръчка"></label><label class="filter-label">Статус <select id="statusFilter"><option value="all">Всички статуси</option></select></label><label class="filter-label">Плащане <select id="paymentFilter"><option value="all">Всички</option><option value="unpaid">Без плащане</option><option value="partial">Частично</option><option value="paid">Платени</option></select></label></div><p class="results-label" id="orderResults" role="status"></p><div id="ordersTable"></div></div>
+    </section>
+    <section id="view-production" class="view" aria-label="Работен план" hidden><div class="production-summary" id="productionSummary"></div><div id="productionBoard" class="production-board"></div></section>
+    <section id="view-customers" class="view" aria-label="Клиенти" hidden><div class="panel"><div class="panel-heading"><h2>Хората зад подаръците</h2><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="customerSearch" placeholder="Потърси клиент…" aria-label="Търси клиент"></label></div><p class="panel-footnote">Историята се групира по имейл, а при липса — по телефон или име.</p><div id="customersTable"></div></div></section>
+    <footer class="admin-footer"><p><span aria-hidden="true">◉</span> Данните остават в този браузър. Няма връзка с имейл запитванията.</p><div><button class="text-button" id="backup" type="button">Архив JSON ↓</button><button class="text-button" id="restore" type="button">Възстанови архив</button><input id="backupFile" type="file" accept=".json,application/json" hidden></div></footer>
+    <noscript><p class="notice">Включи JavaScript, за да използваш локалния тракер.</p></noscript>
+  </main>
+</div>
+<dialog id="orderDialog" aria-labelledby="dialogTitle"><form id="orderForm"><header class="dialog-heading"><div><p class="eyebrow" id="dialogEyebrow">НЕЩО ХУБАВО ЗАПОЧВА ТУК</p><h2 id="dialogTitle">Нова поръчка</h2></div><button class="icon-button" type="button" id="closeOrder" aria-label="Затвори">×</button></header><div class="dialog-body">
+  <div class="form-grid"><label>Клиент *<input name="customer" maxlength="100" required autocomplete="off"></label><label>Имейл<input name="email" type="email" maxlength="254" autocomplete="off"></label><label>Телефон<input name="phone" type="tel" maxlength="40" autocomplete="off"></label><label>Повод<input name="occasion" maxlength="100" placeholder="Сватба, рожден ден…"></label><label>Дата на поръчката *<input name="created" type="date" required></label><label>Краен срок *<input name="due" type="date" required></label><label>Статус<select name="status" id="formStatus"></select></label><label>Получено плащане (EUR)<input name="paid" type="number" min="0" max="10000000" step="0.01" required value="0"></label></div>
+  <div class="items-heading"><h3>Какво изработваме?</h3><button class="text-button" type="button" id="addItem">＋ Добави модел</button></div><div id="orderItems"></div><div class="form-totals"><span>Общо <strong id="formTotal">0,00 €</strong></span><span>За доплащане <strong id="formBalance">0,00 €</strong></span></div>
+  <label>Лични детайли и бележки<textarea name="notes" rows="3" maxlength="2000" placeholder="Имена, цветове, послание, начин на предаване…"></textarea></label><p class="form-error" id="formError" role="alert"></p>
+</div><footer class="dialog-footer"><button class="text-button danger" id="cancelOrder" type="button" hidden>Откажи поръчката</button><div><button class="button secondary" id="dismissOrder" type="button">Затвори</button><button class="button primary" type="submit">Запази поръчката ↗</button></div></footer></form></dialog>
+<dialog id="confirmDialog" aria-labelledby="confirmTitle"><div class="confirm-body"><p class="eyebrow">ПОТВЪРЖДЕНИЕ</p><h2 id="confirmTitle"></h2><p id="confirmText"></p><div class="confirm-actions"><button class="button secondary" id="confirmNo" type="button">Назад</button><button class="button primary" id="confirmYes" type="button">Потвърди</button></div></div></dialog>
+<div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+</body>
+</html>
