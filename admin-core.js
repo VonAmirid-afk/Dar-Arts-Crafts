@@ -58,5 +58,6 @@
     return '\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
   }
   const api={statuses,active,total,balance,dateKey,dateValid,daysUntil,validateOrder,validateBackup,stats,months,customers,csv};
-  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DarAdmin=api;
+  root.DarAdmin=api;
+  if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

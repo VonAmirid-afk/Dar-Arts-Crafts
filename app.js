@@ -325,7 +325,6 @@ lightbox.addEventListener('close', () => {
 });
 render();
 
-const contactEmail = 'ydirimanov@gmail.com';
 const contactForm = document.querySelector('#contactForm');
 function buildEnquiry() {
   const data = new FormData(contactForm);
@@ -335,7 +334,7 @@ function buildEnquiry() {
   const message = data.get('message').trim();
   const models = [...selectedModels].map(([id, quantity]) => {
     const item = catalogueById.get(id);
-    return `${id} — ${item.title} — ${quantity} бр.\nhttps://vonamirid-afk.github.io/Dar-Arts-Crafts/?model=${id}`;
+    return `${id} — ${item.title} — ${quantity} бр.\n${location.origin}/?model=${id}`;
   });
   const subject = `Запитване за ДАР${occasion ? ` — ${occasion}` : ''}`;
   const body = `${message || 'Здравейте! Бих искал/а да науча повече за избраните модели.'}${models.length ? `\n\nИзбрани модели (${models.length}):\n${models.join('\n\n')}` : ''}\n\nПовод: ${occasion || 'Не е посочен'}\nОт: ${name}\nИмейл за отговор: ${email}`;
@@ -351,44 +350,18 @@ function validateEnquiry() {
   }
   return true;
 }
-contactForm.addEventListener('submit', event => {
+let enquiryId = crypto.randomUUID();
+contactForm.addEventListener('submit', async event => {
   event.preventDefault();
-  if (contactForm.querySelector('[type="submit"]').disabled) return;
-  if (!validateEnquiry()) return;
-  const { name, subject, body } = buildEnquiry();
-  const status = contactForm.querySelector('.form-status');
-  const submitButton = contactForm.querySelector('[type="submit"]');
-  const formData = new FormData(contactForm);
-  const payload = {
-    name,
-    email: formData.get('email').trim(),
-    _replyto: formData.get('email').trim(),
-    _subject: subject,
-    _honey: formData.get('_honey') || '',
-    _captcha: 'true',
-    _next: new URL('thank-you.html', window.location.href).href,
-    _autoresponse: 'Здравейте!\n\nБлагодарим Ви, че се свързахте с ДАР! Получихме Вашето запитване и ще го разгледаме с внимание. Ще Ви отговорим на посочения имейл възможно най-скоро, за да обсъдим Вашата идея и детайлите.\n\nТова е автоматично потвърждение за получено запитване.\n\nС най-добри пожелания,\nДАР — малки жестове, големи чувства',
-    occasion: formData.get('occasion').trim() || 'Не е посочен',
-    message: body
-  };
-  document.querySelector('#enquiryText').value = body;
-  submitButton.disabled = true;
-  status.textContent = 'Продължаваме към потвърждение и изпращане…';
-  // Auto replies require a standard POST with FormSubmit's CAPTCHA enabled.
-  const submission = document.createElement('form');
-  submission.method = 'POST';
-  submission.action = `https://formsubmit.co/${encodeURIComponent(contactEmail)}`;
-  submission.hidden = true;
-  for (const [name, value] of Object.entries(payload)) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    submission.append(input);
-  }
-  document.body.append(submission);
-  HTMLFormElement.prototype.submit.call(submission);
-  submission.remove();
+  const button=contactForm.querySelector('[type="submit"]'), status=contactForm.querySelector('.form-status');
+  if(button.disabled || !validateEnquiry()) return;
+  const data=new FormData(contactForm);
+  button.disabled=true; status.textContent='Изпращаме запитването…';
+  try {
+    const response=await fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:enquiryId,name:data.get('name').trim(),email:data.get('email').trim(),occasion:data.get('occasion').trim(),message:data.get('message').trim(),website:data.get('website'),items:[...selectedModels].map(([id,qty])=>({model:id,title:catalogueById.get(id).title,qty}))})});
+    const result=await response.json();if(!response.ok)throw Error(result.error);
+    location.href='thank-you.html';
+  } catch(error) {status.textContent=error.message||'Изпращането не успя. Опитайте отново или копирайте запитването.';button.disabled=false;}
 });
 window.addEventListener('pageshow', () => {
   contactForm.querySelector('[type="submit"]').disabled = false;
