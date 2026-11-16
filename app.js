@@ -325,7 +325,8 @@ lightbox.addEventListener('close', () => {
 });
 render();
 
-const contactEmail = 'ydirimanov@gmail.com';
+// Public EmailJS identifiers; the recipient is fixed in the EmailJS template.
+const emailjsConfig = { service_id: 'service_67d9tsh', template_id: 'template_s1pdr48', user_id: 'NTle8k42kUvJRsEhs' };
 const contactForm = document.querySelector('#contactForm');
 function buildEnquiry() {
   const data = new FormData(contactForm);
@@ -335,7 +336,7 @@ function buildEnquiry() {
   const message = data.get('message').trim();
   const models = [...selectedModels].map(([id, quantity]) => {
     const item = catalogueById.get(id);
-    return `${id} — ${item.title} — ${quantity} бр.\nhttps://vonamirid-afk.github.io/Dar-Arts-Crafts/?model=${id}`;
+    return `${id} — ${item.title} — ${quantity} бр.\n${new URL(`?model=${encodeURIComponent(id)}`, window.location.href).href}`;
   });
   const subject = `Запитване за ДАР${occasion ? ` — ${occasion}` : ''}`;
   const body = `${message || 'Здравейте! Бих искал/а да науча повече за избраните модели.'}${models.length ? `\n\nИзбрани модели (${models.length}):\n${models.join('\n\n')}` : ''}\n\nПовод: ${occasion || 'Не е посочен'}\nОт: ${name}\nИмейл за отговор: ${email}`;
@@ -351,44 +352,39 @@ function validateEnquiry() {
   }
   return true;
 }
-contactForm.addEventListener('submit', event => {
+contactForm.addEventListener('submit', async event => {
   event.preventDefault();
-  if (contactForm.querySelector('[type="submit"]').disabled) return;
-  if (!validateEnquiry()) return;
-  const { name, subject, body } = buildEnquiry();
-  const status = contactForm.querySelector('.form-status');
   const submitButton = contactForm.querySelector('[type="submit"]');
+  if (submitButton.disabled || !validateEnquiry()) return;
   const formData = new FormData(contactForm);
-  const payload = {
-    name,
-    email: formData.get('email').trim(),
-    _replyto: formData.get('email').trim(),
-    _subject: subject,
-    _honey: formData.get('_honey') || '',
-    _captcha: 'true',
-    _next: new URL('thank-you.html', window.location.href).href,
-    _autoresponse: 'Здравейте!\n\nБлагодарим Ви, че се свързахте с ДАР! Получихме Вашето запитване и ще го разгледаме с внимание. Ще Ви отговорим на посочения имейл възможно най-скоро, за да обсъдим Вашата идея и детайлите.\n\nТова е автоматично потвърждение за получено запитване.\n\nС най-добри пожелания,\nДАР — малки жестове, големи чувства',
-    occasion: formData.get('occasion').trim() || 'Не е посочен',
-    message: body
-  };
+  if (formData.get('website')) return;
+  const { name, body } = buildEnquiry();
+  const status = contactForm.querySelector('.form-status');
   document.querySelector('#enquiryText').value = body;
   submitButton.disabled = true;
-  status.textContent = 'Продължаваме към потвърждение и изпращане…';
-  // Auto replies require a standard POST with FormSubmit's CAPTCHA enabled.
-  const submission = document.createElement('form');
-  submission.method = 'POST';
-  submission.action = `https://formsubmit.co/${encodeURIComponent(contactEmail)}`;
-  submission.hidden = true;
-  for (const [name, value] of Object.entries(payload)) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    submission.append(input);
+  status.textContent = 'Изпращаме запитването…';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({ ...emailjsConfig, template_params: {
+        name, email: formData.get('email').trim(),
+        occasion: formData.get('occasion').trim() || 'Не е посочен', message: body
+      } })
+    });
+    if (!response.ok) throw new Error('provider');
+    window.location.assign(new URL('thank-you.html', window.location.href).href);
+  } catch (error) {
+    status.textContent = error.message === 'provider'
+      ? 'Изпращането не успя. Опитай по-късно или копирай запитването и го изпрати на hello@dar-arts.com.'
+      : 'Не успяхме да потвърдим изпращането. То може вече да е получено. При нужда пиши на hello@dar-arts.com.';
+    submitButton.disabled = false;
+  } finally {
+    clearTimeout(timeout);
   }
-  document.body.append(submission);
-  HTMLFormElement.prototype.submit.call(submission);
-  submission.remove();
 });
 window.addEventListener('pageshow', () => {
   contactForm.querySelector('[type="submit"]').disabled = false;

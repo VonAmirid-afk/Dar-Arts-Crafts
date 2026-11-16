@@ -22,9 +22,9 @@ Visitors can save models from catalogue cards or previews, review/remove them be
 
 ## Email form
 
-The form sends enquiries to `ydirimanov@gmail.com` through a standard FormSubmit POST with CAPTCHA enabled. After completing the verification, visitors return to `thank-you.html` and receive a polite Bulgarian automatic acknowledgement with a copy of their submission. FormSubmit does not support automatic replies through AJAX or with CAPTCHA disabled. The acknowledgement confirms receipt of an enquiry, not an order.
+The temporary form uses the EmailJS REST API with service `service_67d9tsh` and template `template_s1pdr48`. The public key in `app.js` is intentionally public. Set the template's **To Email** to the fixed address `hello@dar-arts.com`, **Reply-To** to `{{email}}`, and keep the service's default sender. Template parameters are `name`, `email`, `occasion`, and `message`; message includes selected models, quantities, and links on the current website domain.
 
-FormSubmit requires the inbox owner to confirm its first activation email before it starts delivering submissions. The copy-text fallback remains available. Contact details are not saved by this site.
+The connected email service and template must be active in EmailJS. Successful API responses redirect to `thank-you.html`; failures preserve the form and allow copying the enquiry. No customer auto-reply is configured. The browser honeypot and disabled submit button are basic safeguards, not server-side spam protection. Verify real delivery through the live form and EmailJS history after deployment. No live test email was sent during implementation.
 
 ## Publishing
 
