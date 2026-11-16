@@ -160,7 +160,7 @@ function syncSelection(changedModel = null, rebuildList = true) {
     });
     list.scrollTop = listScroll;
   }
-  syncQuantityControls(changedModel);
+  syncQuantityControls(rebuildList ? null : changedModel);
   if (document.querySelector('#enquiryText').value) document.querySelector('#enquiryText').value = buildEnquiry().body;
 }
 function toggleSelection(item, trigger) {
@@ -269,7 +269,7 @@ function render(append = false) {
     img.fetchPriority = 'low';
     const zoom = document.createElement('span');
     zoom.className = 'piece-zoom';
-    zoom.textContent = '↗';
+    zoom.append(createArrowIcon());
     zoom.setAttribute('aria-hidden', 'true');
     frame.append(img, zoom);
     const meta = document.createElement('span');
@@ -284,7 +284,7 @@ function render(append = false) {
     title.textContent = item.title;
     const subtitle = document.createElement('span');
     subtitle.className = 'piece-subtitle';
-    subtitle.textContent = 'Виж детайлите ↗';
+    subtitle.append('Виж детайлите ', createArrowIcon());
     button.append(frame, meta, title, subtitle);
     button.addEventListener('click', () => openPreview(item, button));
     const save = document.createElement('button');

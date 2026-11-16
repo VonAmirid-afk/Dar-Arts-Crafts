@@ -263,7 +263,7 @@ footer>a:last-child{margin-left:auto}
 .contact-form label{display:block;font-size:13px;font-weight:500;margin-bottom:22px}
 .contact-form .optional{font-size:11px;font-weight:400;color:var(--muted)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.contact-form input,.contact-form textarea{display:block;width:100%;min-width:0;margin-top:8px;padding:10px 0;border:0;border-bottom:1px solid #bfb5ad;border-radius:0;background:transparent;color:var(--ink);font:400 14px/1.5 'Sofia Sans',Arial,sans-serif}
+.contact-form input,.contact-form textarea{display:block;width:100%;min-width:0;margin-top:8px;padding:10px 0;border:0;border-bottom:1px solid #bfb5ad;border-radius:0;background:transparent;color:var(--ink);font:400 14px/1.5 'Manrope',Arial,sans-serif}
 .contact-form textarea{resize:vertical;min-height:110px;max-height:400px}
 .contact-form input::placeholder,.contact-form textarea::placeholder{color:#77706a;opacity:1}
 .contact-form input:focus-visible,.contact-form textarea:focus-visible{outline:2px solid #b34425;outline-offset:4px}
@@ -307,6 +307,8 @@ footer>a:last-child{margin-left:auto}
 
 /* SVG ornaments retain their shape and color on iOS and Android. */
 .star-icon{display:block;width:1em;height:1em;flex:none;overflow:visible}
+.arrow-icon{display:inline-block;width:1em;height:1em;flex:none;vertical-align:-.125em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.maker-disc,.care-note>span{flex:none}
 .logo>span{width:1em;height:1em}
 .little-star,.about-sun,.closing-flower{width:1em;height:1em;pointer-events:none}
 .piece{display:flex;flex-direction:column;align-self:start;align-items:stretch;appearance:none;-webkit-appearance:none}
@@ -420,7 +422,7 @@ body:has(.selection-shortcut:not([hidden])) footer{padding-bottom:100px}
 .quantity-control button{width:44px;height:44px;padding:0;border:0;border-radius:0;background:transparent;color:var(--ink);font-size:22px;line-height:1;flex:none}
 .quantity-control button:hover:not(:disabled){background:var(--pink)}
 .quantity-control button:disabled{opacity:.35;cursor:default}
-.quantity-control input,.contact-form .quantity-control input{width:48px;min-width:0;height:44px;padding:0;margin:0;text-align:center;border:0;border-inline:1px solid #ddd2c4;border-radius:0;background:transparent;color:var(--ink);font:500 16px/1 'Sofia Sans',Arial,sans-serif;appearance:textfield;-moz-appearance:textfield}
+.quantity-control input,.contact-form .quantity-control input{width:48px;min-width:0;height:44px;padding:0;margin:0;text-align:center;border:0;border-inline:1px solid #ddd2c4;border-radius:0;background:transparent;color:var(--ink);font:500 16px/1 'Manrope',Arial,sans-serif;appearance:textfield;-moz-appearance:textfield}
 .quantity-control input::-webkit-inner-spin-button,.quantity-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .quantity-control :focus-visible{outline-offset:-3px}
 .selection-list li{flex-wrap:wrap}
