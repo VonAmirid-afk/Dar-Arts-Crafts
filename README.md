@@ -16,6 +16,8 @@ Product data lives in `catalogue.js`. The website serves responsive WebP images 
 
 Product previews support previous/next controls, keyboard arrows, and horizontal swipes on the image. Navigation and the surprise button follow the active category/search. Scroll reveals, hand-drawn scribbles, floating paper shapes, pointer-responsive collage/card tilt, and save confetti respect reduced-motion preferences and require no animation library. Decorative loops pause offscreen or when the tab is hidden, and particle bursts are removed after 750 ms. The catalogue uses lazy, responsive WebP images; offscreen cards are deferred by the browser. Quantity changes update only the affected controls instead of rebuilding the saved list.
 
+The product viewer sizes image requests to the photo's contained display area and device pixel ratio. Rapid navigation is coalesced over 80 ms so skipped models do not each start a download. Once the current photo loads, the next and previous photos are prefetched at low priority (except with Data Saver enabled). Only adjacent preload objects are retained, and pending navigation timers are cleared when the viewer closes.
+
 ## Saved selections
 
 Visitors can save models from catalogue cards or previews, review/remove them beside the enquiry form, and include them in an email. Model IDs and requested quantities are stored in localStorage; form contact details are not persisted. Visitors can adjust quantities on cards, in previews, or beside the form. Email enquiries include quantities, model titles, codes, and direct `?model=DAR-001` links. A copy-text fallback is available if submission fails. There is no checkout, payment, or order placement.

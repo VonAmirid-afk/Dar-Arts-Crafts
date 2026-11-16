@@ -187,9 +187,69 @@ window.addEventListener('storage', event => {
 
 let previewScrollY = 0;
 const previewStatus = lightbox.querySelector('.preview-status');
-lightboxImage.addEventListener('load', () => { previewStatus.textContent = ''; });
+let previewLoadTimer;
+let previewPreloadTimer;
+const previewPreloads = new Map();
+function previewSource(item) {
+  const bounds = lightbox.querySelector('.preview-image').getBoundingClientRect();
+  // object-fit contains portrait photos in a short mobile viewer. Fetch for the
+  // actual painted width, rather than the full width of the phone's screen.
+  const width = Math.min(bounds.width, bounds.height * item.width / item.height);
+  const required = Math.max(1, width) * (window.devicePixelRatio || 1);
+  const index = item.widths.findIndex(candidate => candidate >= required);
+  return mediaPath(item, [480, 800, 1280][index < 0 ? 2 : index]);
+}
+function warmPreviewNeighbours() {
+  clearTimeout(previewPreloadTimer);
+  if (!lightbox.open || navigator.connection?.saveData) return;
+  previewPreloadTimer = setTimeout(() => {
+    if (!lightbox.open || previewModels.length < 2) return;
+    const index = previewModels.indexOf(previewItem);
+    const neighbours = [1, -1].map(direction => previewModels[(index + direction + previewModels.length) % previewModels.length]);
+    const sources = new Set(neighbours.map(previewSource));
+    // Retain only the adjacent image objects; the browser manages HTTP caching.
+    for (const source of previewPreloads.keys()) {
+      if (!sources.has(source)) previewPreloads.delete(source);
+    }
+    sources.forEach(source => {
+      if (previewPreloads.has(source)) return;
+      const image = new Image();
+      image.decoding = 'async';
+      image.fetchPriority = 'low';
+      image.src = source;
+      previewPreloads.set(source, image);
+    });
+  }, 150);
+}
+function previewLoaded() {
+  if (!lightbox.open || !lightboxImage.complete || !lightboxImage.naturalWidth) return;
+  if (lightboxImage.getAttribute('src') !== previewSource(previewItem)) return;
+  previewStatus.textContent = '';
+  warmPreviewNeighbours();
+}
+function loadPreviewImage(item, immediate) {
+  clearTimeout(previewLoadTimer);
+  clearTimeout(previewPreloadTimer);
+  previewStatus.textContent = 'Зареждане на снимката…';
+  // Coalesce rapid taps/swipes instead of downloading every skipped model.
+  const load = () => {
+    if (!lightbox.open || previewItem !== item) return;
+    lightboxImage.width = item.width;
+    lightboxImage.height = item.height;
+    lightboxImage.alt = `${item.title} — ${item.id}`;
+    lightboxImage.fetchPriority = 'high';
+    lightboxImage.src = previewSource(item);
+    previewLoaded(); // Cached images may already be complete.
+  };
+  if (immediate) load();
+  else previewLoadTimer = setTimeout(load, 80);
+}
+lightboxImage.addEventListener('load', previewLoaded);
 lightboxImage.addEventListener('error', () => {
-  if (lightbox.open) previewStatus.textContent = 'Снимката не се зареди. Затвори прегледа и опитай отново.';
+  if (lightbox.open && lightboxImage.getAttribute('src') === previewSource(previewItem)) previewStatus.textContent = 'Снимката не се зареди. Затвори прегледа и опитай отново.';
+});
+window.addEventListener('resize', () => {
+  if (lightbox.open && previewItem) loadPreviewImage(previewItem, false);
 });
 
 categories.forEach(category => {
@@ -219,14 +279,7 @@ function openPreview(item, button) {
   setChoiceButton(previewSave, item);
   lightbox.querySelector('.quantity-control')?.remove();
   previewSave.after(createQuantityControl(item, 'preview'));
-  syncQuantityControls();
-  previewStatus.textContent = 'Зареждане на снимката…';
-  lightboxImage.width = item.width;
-  lightboxImage.height = item.height;
-  lightboxImage.sizes = '(max-width: 700px) calc(100vw - 20px), 540px';
-  lightboxImage.srcset = sourceSet(item);
-  lightboxImage.src = mediaPath(item, 800);
-  lightboxImage.alt = `${item.title} — ${item.id}`;
+  syncQuantityControls(item.id);
   document.querySelector('#previewCategory').textContent = item.category;
   document.querySelector('#previewTitle').textContent = item.title;
   document.querySelector('#previewDescription').textContent = 'Ръчно изработен модел с личен характер. Разгледай снимката отблизо, за да откриеш цветовете, материалите и малките детайли.';
@@ -235,6 +288,7 @@ function openPreview(item, button) {
   document.querySelector('#previousModel').disabled = previewModels.length < 2;
   document.querySelector('#nextModel').disabled = previewModels.length < 2;
   if (opening) lightbox.showModal();
+  loadPreviewImage(item, opening);
   lightbox.querySelector('.preview-content').scrollTop = 0;
   if (opening) lightbox.querySelector('.close-preview').focus({ preventScroll: true });
 }
@@ -315,6 +369,9 @@ lightbox.addEventListener('click', event => {
   if (event.target === lightbox && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) lightbox.close();
 });
 lightbox.addEventListener('close', () => {
+  clearTimeout(previewLoadTimer);
+  clearTimeout(previewPreloadTimer);
+  previewPreloads.clear();
   lightboxImage.removeAttribute('srcset');
   lightboxImage.removeAttribute('src');
   previewStatus.textContent = '';
