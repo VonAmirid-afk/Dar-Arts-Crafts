@@ -326,7 +326,7 @@ lightbox.addEventListener('close', () => {
 render();
 
 // Public EmailJS identifiers; the recipient is fixed in the EmailJS template.
-const emailjsConfig = { service_id: 'service_67d9tsh', template_id: 'template_s1pdr48', user_id: 'NTle8k42kUvJRsEhs' };
+const emailjsConfig = { service_id: 'service_9ep1688', template_id: 'template_s1pdr48', user_id: 'NTle8k42kUvJRsEhs' };
 const contactForm = document.querySelector('#contactForm');
 function buildEnquiry() {
   const data = new FormData(contactForm);

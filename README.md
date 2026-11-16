@@ -22,7 +22,7 @@ Visitors can save models from catalogue cards or previews, review/remove them be
 
 ## Email form
 
-The temporary form uses the EmailJS REST API with service `service_67d9tsh` and template `template_s1pdr48`. The public key in `app.js` is intentionally public. Set the template's **To Email** to the fixed address `hello@dar-arts.com`, **Reply-To** to `{{email}}`, and keep the service's default sender. Template parameters are `name`, `email`, `occasion`, and `message`; message includes selected models, quantities, and links on the current website domain.
+The temporary form uses the EmailJS REST API with service `service_9ep1688` and template `template_s1pdr48`. The public key in `app.js` is intentionally public. Set the template's **To Email** to the fixed address `hello@dar-arts.com`, **Reply-To** to `{{email}}`, and keep the service's default sender. Template parameters are `name`, `email`, `occasion`, and `message`; message includes selected models, quantities, and links on the current website domain.
 
 The connected email service and template must be active in EmailJS. Successful API responses open a compact confirmation dialog with a blurred backdrop; failures preserve the form and allow copying the enquiry. No customer auto-reply is configured. The browser honeypot and disabled submit button are basic safeguards, not server-side spam protection. Verify real delivery through the live form and EmailJS history after deployment. No live test email was sent during implementation.
 
