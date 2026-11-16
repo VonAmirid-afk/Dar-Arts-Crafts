@@ -33,7 +33,7 @@ GitHub Pages publishes the root of the `main` branch. Push changes to `main` to 
 
 ## Editorial pages
 
-- `creator.html`: the creator story. Мила and the biography are draft copy requested for the design; replace them with the real creator details before treating them as factual.
+- `creator.html`: the creator story. Пламена and the biography are draft copy requested for the design; replace them with the real creator details before treating them as factual.
 - `materials.html`: paper, card, decorative materials, and care guidance. Material descriptions are draft copy to confirm with the creator.
 - `how-it-works.html`: enquiry steps and an accessible FAQ about personalization, timing, pricing, payment, and receiving the work.
 
