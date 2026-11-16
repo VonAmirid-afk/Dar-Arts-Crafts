@@ -612,3 +612,14 @@ textarea:focus-visible,summary:focus-visible{outline:3px solid #b34425;outline-o
  .paper-study:hover .paper-sheet-three{transform:translate(12%,28px) rotate(24deg) scale(.9);transition-delay:.14s}
  .paper-study:hover .paper-sheet{box-shadow:6px 15px 25px #25232324}
 }
+
+/* Compact enquiry confirmation. Native dialog handles focus and Escape. */
+.thank-you-popup{width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 48px);margin:auto;padding:38px 28px 30px;border:1px solid #e4d6ce;border-radius:20px;background:#fffdf9;color:#302720;box-shadow:0 24px 80px #30272033;text-align:center;overflow:auto}
+.thank-you-popup::backdrop{background:rgb(40 31 28 / 32%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.thank-you-popup form{margin:0}
+.thank-you-close{position:absolute;top:10px;right:10px;width:40px;height:40px;border:0;background:transparent;color:inherit;font-size:28px;cursor:pointer}
+.thank-you-mark{display:block;color:#ad6477;font-size:42px;line-height:1;margin-bottom:18px}
+.thank-you-popup h2{font-size:clamp(30px,7vw,40px);line-height:1.15;margin:12px 0 18px}
+.thank-you-popup #thankYouDescription{font-size:15px;line-height:1.7;margin:0 0 24px}
+.thank-you-popup .eyebrow{font-size:10px}
+body:has(.thank-you-popup[open]){overflow:hidden}

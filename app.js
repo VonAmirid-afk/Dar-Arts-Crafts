@@ -376,7 +376,15 @@ contactForm.addEventListener('submit', async event => {
       } })
     });
     if (!response.ok) throw new Error('provider');
-    window.location.assign(new URL('thank-you.html', window.location.href).href);
+    contactForm.reset();
+    selectedModels.clear();
+    try { localStorage.removeItem(selectionStorageKey); } catch { /* Clear the current selection even if storage is unavailable. */ }
+    document.querySelector('#enquiryText').value = '';
+    document.querySelector('#copyStatus').textContent = '';
+    syncSelection();
+    status.textContent = '';
+    document.querySelector('#thankYouPopup').showModal();
+    submitButton.disabled = false;
   } catch (error) {
     status.textContent = error.message === 'provider'
       ? 'Изпращането не успя. Опитай по-късно или копирай запитването и го изпрати на hello@dar-arts.com.'
@@ -385,6 +393,11 @@ contactForm.addEventListener('submit', async event => {
   } finally {
     clearTimeout(timeout);
   }
+});
+const thankYouPopup = document.querySelector('#thankYouPopup');
+thankYouPopup.addEventListener('click', event => {
+  const rect = thankYouPopup.getBoundingClientRect();
+  if (event.target === thankYouPopup && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) thankYouPopup.close();
 });
 window.addEventListener('pageshow', () => {
   contactForm.querySelector('[type="submit"]').disabled = false;
